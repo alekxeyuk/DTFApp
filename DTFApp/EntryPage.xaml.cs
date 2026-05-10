@@ -89,6 +89,7 @@ namespace DTFApp
             _renderers = new Dictionary<string, Func<Block, UIElement>>
             {
                 { "text", RenderText },
+                { "list", RenderList },
             };
         }
 
@@ -110,6 +111,32 @@ namespace DTFApp
                 Margin = new Thickness(0, 5, 0, 5)
             };
             return textBlock;
+        }
+
+        private UIElement RenderList(Block block)
+        {
+            var data = block.Data;
+            if (data?.Items == null) return null;
+
+            var panel = new StackPanel { Margin = new Thickness(0, 5, 0, 5) };
+            bool isOrdered = data.ListType == "OL";
+
+            for (int i = 0; i < data.Items.Length; i++)
+            {
+                var item = data.Items[i]?.ToString();
+                if (string.IsNullOrEmpty(item)) continue;
+
+                var prefix = isOrdered ? $"{i + 1}. " : "• ";
+                var textBlock = new TextBlock
+                {
+                    Text = prefix + StripHtml(item),
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(0, 2, 0, 2)
+                };
+                panel.Children.Add(textBlock);
+            }
+
+            return panel;
         }
 
         private string StripHtml(string html)
