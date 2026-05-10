@@ -1,0 +1,73 @@
+<Page
+    x:Class="DTFApp.NewsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DTFApp"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+
+    <controls:RefreshContainer x:Name="RefreshContainer" RefreshRequested="RefreshContainer_RefreshRequested">
+        <ListView
+            x:Name="NewsListView"
+            SelectionMode="None"
+            ItemsSource="{x:Bind NewsItems}"
+            ItemClick="NewsListView_ItemClick"
+            IsItemClickEnabled="True">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="local:NewsData">
+                    <StackPanel Margin="10,10,10,10">
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="Gray"
+                            Text="{Binding Subsite.Name}" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="Bold"
+                            Text="{Binding Title}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Margin="0,5,0,5"
+                            FontSize="14"
+                            Text="{Binding OgDescription}"
+                            TextWrapping="Wrap" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="12" Foreground="Gray">
+                                <Run Text="comments: " />
+                                <Run Text="{Binding Counters.Comments, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock
+                                Margin="10,0,0,0"
+                                FontSize="12"
+                                Foreground="Gray">
+                                <Run Text="favorites: " />
+                                <Run Text="{Binding Counters.Favorites, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock
+                                Margin="10,0,0,0"
+                                FontSize="12"
+                                Foreground="Gray">
+                                <Run Text="views: " />
+                                <Run Text="{Binding Counters.Views, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock
+                                Margin="10,0,0,0"
+                                FontSize="12"
+                                Foreground="Gray">
+                                <Run Text="likes: " />
+                                <Run Text="{Binding Likes.CounterLikes, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </controls:RefreshContainer>
+</Page>
