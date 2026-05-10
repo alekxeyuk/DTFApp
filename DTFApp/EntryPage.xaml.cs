@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -6,6 +7,7 @@ using System.Text.RegularExpressions;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace DTFApp
 {
@@ -91,6 +93,7 @@ namespace DTFApp
                 { "text", RenderText },
                 { "list", RenderList },
                 { "quote", RenderQuote },
+                { "media", RenderMedia },
             };
         }
 
@@ -112,6 +115,56 @@ namespace DTFApp
                 Margin = new Thickness(0, 5, 0, 5)
             };
             return textBlock;
+        }
+
+        private UIElement RenderMedia(Block block)
+        {
+            var data = block.Data;
+            if (data?.Items == null) return null;
+
+            var panel = new StackPanel { Margin = new Thickness(0, 10, 0, 10) };
+            int screenWidth = (int)Window.Current.Bounds.Width;
+
+            foreach (var itemObj in data.Items)
+            {
+                var jObject = itemObj as JObject;
+                if (jObject == null) continue;
+
+                var mediaItem = jObject.ToObject<MediaItem>();
+                if (mediaItem?.Image?.Type != "image") continue;
+
+                var imgData = mediaItem.Image.Data;
+                if (imgData == null || string.IsNullOrEmpty(imgData.Uuid)) continue;
+
+                var url = $"https://leonardo.osnova.io/{imgData.Uuid}/-/scale_crop/{screenWidth}x/";
+                var bitmap = new BitmapImage(new Uri(url));
+
+                var placeholder = new Border
+                {
+                    Background = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.DarkGray),
+                    Height = 200,
+                    Margin = new Thickness(0, 5, 0, 5)
+                };
+
+                var image = new Image
+                {
+                    Source = bitmap,
+                    Stretch = Windows.UI.Xaml.Media.Stretch.Uniform,
+                    MaxHeight = 400,
+                    Margin = new Thickness(0, 5, 0, 5)
+                };
+
+                var grid = new Grid();
+                grid.Children.Add(placeholder);
+                grid.Children.Add(image);
+
+                bitmap.ImageOpened += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+                bitmap.ImageFailed += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+
+                panel.Children.Add(grid);
+            }
+
+            return panel.Children.Count > 0 ? panel : null;
         }
 
         private UIElement RenderQuote(Block block)
