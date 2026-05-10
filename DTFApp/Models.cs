@@ -177,6 +177,12 @@ namespace DTFApp
 
         [JsonProperty("height")]
         public int Height { get; set; }
+
+        [JsonProperty("type")]
+        public string DataType { get; set; }
+
+        [JsonProperty("has_audio")]
+        public bool HasAudio { get; set; }
     }
 
     public abstract class BlockRenderer

@@ -136,9 +136,6 @@ namespace DTFApp
                 var imgData = mediaItem.Image.Data;
                 if (imgData == null || string.IsNullOrEmpty(imgData.Uuid)) continue;
 
-                var url = $"https://leonardo.osnova.io/{imgData.Uuid}/-/scale_crop/{screenWidth}x/";
-                var bitmap = new BitmapImage(new Uri(url));
-
                 var placeholder = new Border
                 {
                     Background = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.DarkGray),
@@ -146,20 +143,49 @@ namespace DTFApp
                     Margin = new Thickness(0, 5, 0, 5)
                 };
 
-                var image = new Image
-                {
-                    Source = bitmap,
-                    Stretch = Windows.UI.Xaml.Media.Stretch.Uniform,
-                    MaxHeight = 400,
-                    Margin = new Thickness(0, 5, 0, 5)
-                };
-
                 var grid = new Grid();
                 grid.Children.Add(placeholder);
-                grid.Children.Add(image);
 
-                bitmap.ImageOpened += (s, e) => placeholder.Visibility = Visibility.Collapsed;
-                bitmap.ImageFailed += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+                if (imgData.DataType == "gif")
+                {
+                    var videoUrl = $"https://leonardo.osnova.io/{imgData.Uuid}/-/format/mp4/";
+                    var mediaElement = new MediaElement
+                    {
+                        Source = new Uri(videoUrl),
+                        AutoPlay = !imgData.HasAudio,
+                        IsMuted = true,
+                        AreTransportControlsEnabled = imgData.HasAudio,
+                        Stretch = Windows.UI.Xaml.Media.Stretch.Uniform,
+                        MaxHeight = 400,
+                        Margin = new Thickness(0, 5, 0, 5),
+                        IsLooping = !imgData.HasAudio,
+                    };
+                    grid.Children.Add(mediaElement);
+                    mediaElement.MediaOpened += (s, e) =>
+                    {
+                        placeholder.Visibility = Visibility.Collapsed;
+                        if (mediaElement.NaturalVideoWidth > 0)
+                        {
+                            mediaElement.Height = mediaElement.ActualWidth * mediaElement.NaturalVideoHeight / mediaElement.NaturalVideoWidth;
+                        }
+                    };
+                    mediaElement.MediaFailed += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    var url = $"https://leonardo.osnova.io/{imgData.Uuid}/-/scale_crop/{screenWidth}x/";
+                    var bitmap = new BitmapImage(new Uri(url));
+                    var image = new Image
+                    {
+                        Source = bitmap,
+                        Stretch = Windows.UI.Xaml.Media.Stretch.Uniform,
+                        MaxHeight = 400,
+                        Margin = new Thickness(0, 5, 0, 5)
+                    };
+                    grid.Children.Add(image);
+                    bitmap.ImageOpened += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+                    bitmap.ImageFailed += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+                }
 
                 panel.Children.Add(grid);
             }
