@@ -147,6 +147,9 @@ namespace DTFApp
 
         [JsonProperty("subline1")]
         public string Subline1 { get; set; }
+
+        [JsonProperty("style")]
+        public string HeaderStyle { get; set; }
     }
 
     public class MediaItem
