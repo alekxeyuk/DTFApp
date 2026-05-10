@@ -15,18 +15,17 @@ namespace DTFApp
     public sealed partial class NewsPage : Page
     {
         private readonly HttpClient _httpClient;
-        private readonly ObservableCollection<NewsData> _newsItems;
         private long _lastId;
         private bool _isLoading;
         private bool _hasMoreItems = true;
 
-        public ObservableCollection<NewsData> NewsItems => _newsItems;
+        public ObservableCollection<NewsData> NewsItems { get; }
 
         public NewsPage()
         {
             this.InitializeComponent();
             _httpClient = new HttpClient();
-            _newsItems = new ObservableCollection<NewsData>();
+            NewsItems = new ObservableCollection<NewsData>();
             _lastId = 0;
             Loaded += NewsPage_Loaded;
             NewsListView.Loaded += NewsListView_Loaded;
@@ -44,6 +43,10 @@ namespace DTFApp
 
             _isLoading = true;
 
+            var scrollViewer = FindScrollViewer(NewsListView);
+            double oldOffset = scrollViewer?.VerticalOffset ?? 0;
+            bool wasNearBottom = scrollViewer != null && scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 200;
+
             try
             {
                 string url = _lastId == 0
@@ -55,16 +58,30 @@ namespace DTFApp
 
                 if (newsResponse?.Result?.News != null)
                 {
+                    int oldCount = NewsItems.Count;
+
                     foreach (var item in newsResponse.Result.News)
                     {
                         if (item.Data != null)
                         {
-                            _newsItems.Add(item.Data);
+                            NewsItems.Add(item.Data);
                         }
                     }
 
                     _lastId = newsResponse.Result.LastId;
                     _hasMoreItems = newsResponse.Result.News.Length > 0;
+
+                    if (scrollViewer != null && oldCount > 0 && wasNearBottom)
+                    {
+                        await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () =>
+                        {
+                            var sv = FindScrollViewer(NewsListView);
+                            if (sv != null)
+                            {
+                                sv.ChangeView(null, oldOffset, null);
+                            }
+                        });
+                    }
                 }
             }
             catch (Exception ex)
@@ -81,7 +98,7 @@ namespace DTFApp
         {
             using (args.GetDeferral())
             {
-                _newsItems.Clear();
+                NewsItems.Clear();
                 _lastId = 0;
                 _hasMoreItems = true;
                 await LoadNewsAsync();
@@ -107,7 +124,7 @@ namespace DTFApp
             {
                 scrollViewer.ViewChanged += async (s, args) =>
                 {
-                    if (scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 100)
+                    if (!args.IsIntermediate && scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 100)
                     {
                         await LoadMoreAsync();
                     }
@@ -117,6 +134,7 @@ namespace DTFApp
 
         private async Task LoadMoreAsync()
         {
+            await Task.Delay(50);
             await LoadNewsAsync();
         }
 
