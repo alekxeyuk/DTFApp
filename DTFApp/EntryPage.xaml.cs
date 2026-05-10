@@ -301,8 +301,7 @@ namespace DTFApp
 
             foreach (var itemObj in data.Items)
             {
-                var jObject = itemObj as JObject;
-                if (jObject == null) continue;
+                if (!(itemObj is JObject jObject)) continue;
 
                 var mediaItem = jObject.ToObject<MediaItem>();
                 if (mediaItem?.Image?.Type != "image") continue;
@@ -380,7 +379,7 @@ namespace DTFApp
             var textBlock = new TextBlock
             {
                 Text = quoteText,
-                FontStyle = Windows.UI.Text.FontStyle.Italic,
+                FontStyle = FontStyle.Italic,
                 FontSize = 16,
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(12, 5, 0, 5)
