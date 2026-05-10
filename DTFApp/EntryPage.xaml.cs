@@ -9,7 +9,6 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace DTFApp
@@ -21,8 +20,7 @@ namespace DTFApp
         private readonly Grid _fullscreenOverlay = new Grid
         {
             Visibility = Visibility.Collapsed,
-            Background = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Black),
-            ManipulationMode = ManipulationModes.All
+            Background = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Black)
         };
 
         private readonly Image _fullscreenImage = new Image
@@ -122,12 +120,6 @@ namespace DTFApp
 
         private void SetupFullscreenOverlay()
         {
-            _fullscreenOverlay.ManipulationDelta += (s, e) =>
-            {
-                if (Math.Abs(e.Cumulative.Translation.Y) > 150)
-                    HideFullscreenImage();
-            };
-
             var closeButton = new Button
             {
                 Content = "✕",
