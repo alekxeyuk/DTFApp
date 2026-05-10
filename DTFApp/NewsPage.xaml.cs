@@ -3,7 +3,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -31,9 +30,17 @@ namespace DTFApp
             NewsListView.Loaded += NewsListView_Loaded;
         }
 
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.GoBack();
+        }
+
         private async void NewsPage_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadNewsAsync();
+            if (NewsItems.Count == 0)
+            {
+                await LoadNewsAsync();
+            }
         }
 
         private async Task LoadNewsAsync()
@@ -105,15 +112,11 @@ namespace DTFApp
             }
         }
 
-        private async void NewsListView_ItemClick(object sender, ItemClickEventArgs e)
+        private void NewsListView_ItemClick(object sender, ItemClickEventArgs e)
         {
             if (e.ClickedItem is NewsData newsItem)
             {
-                if (!string.IsNullOrEmpty(newsItem.Url))
-                {
-                    var uri = new Uri(newsItem.Url);
-                    await Launcher.LaunchUriAsync(uri);
-                }
+                this.Frame.Navigate(typeof(EntryPage), newsItem.Id);
             }
         }
 

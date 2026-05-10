@@ -100,4 +100,77 @@ namespace DTFApp
         [JsonProperty("counterLikes")]
         public long CounterLikes { get; set; }
     }
+
+    public class EntryResponse
+    {
+        [JsonProperty("result")]
+        public EntryResult Result { get; set; }
+    }
+
+    public class EntryResult
+    {
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
+        [JsonProperty("blocks")]
+        public Block[] Blocks { get; set; }
+    }
+
+    public class Block
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("cover")]
+        public bool Cover { get; set; }
+
+        [JsonProperty("hidden")]
+        public bool Hidden { get; set; }
+
+        [JsonProperty("anchor")]
+        public string Anchor { get; set; }
+
+        [JsonProperty("data")]
+        public BlockData Data { get; set; }
+    }
+
+    public class BlockData
+    {
+        [JsonProperty("text")]
+        public string Text { get; set; }
+
+        [JsonProperty("items")]
+        public object[] Items { get; set; }
+
+        [JsonProperty("type")]
+        public string ListType { get; set; }
+
+        [JsonProperty("subline1")]
+        public string Subline1 { get; set; }
+    }
+
+    public abstract class BlockRenderer
+    {
+        public abstract Windows.UI.Xaml.UIElement Render(Block block);
+    }
+
+    public class TextBlockRenderer : BlockRenderer
+    {
+        public override Windows.UI.Xaml.UIElement Render(Block block)
+        {
+            var textBlock = new Windows.UI.Xaml.Controls.TextBlock
+            {
+                Text = StripHtml(block.Data.Text),
+                TextWrapping = Windows.UI.Xaml.TextWrapping.Wrap,
+                Margin = new Windows.UI.Xaml.Thickness(0, 5, 0, 5)
+            };
+            return textBlock;
+        }
+
+        private string StripHtml(string html)
+        {
+            if (string.IsNullOrEmpty(html)) return "";
+            return System.Text.RegularExpressions.Regex.Replace(html, "<[^>]*>", "");
+        }
+    }
 }

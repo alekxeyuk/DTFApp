@@ -7,67 +7,77 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled">
 
-    <controls:RefreshContainer x:Name="RefreshContainer" RefreshRequested="RefreshContainer_RefreshRequested">
-        <ListView
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Button Grid.Row="0" Content="&lt; Back" Click="BackButton_Click" Margin="10,10,10,0"/>
+
+        <controls:RefreshContainer x:Name="RefreshContainer" Grid.Row="1" RefreshRequested="RefreshContainer_RefreshRequested">
+            <ListView
             x:Name="NewsListView"
             SelectionMode="None"
             ItemsSource="{x:Bind NewsItems}"
             ItemClick="NewsListView_ItemClick"
             IsItemClickEnabled="True">
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsStackPanel />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="local:NewsData">
-                    <StackPanel Margin="10,10,10,10">
-                        <TextBlock
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsStackPanel />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="local:NewsData">
+                        <StackPanel Margin="10,10,10,10">
+                            <TextBlock
                             FontSize="12"
                             Foreground="Gray"
                             Text="{Binding Subsite.Name}" />
-                        <TextBlock
+                            <TextBlock
                             FontSize="18"
                             FontWeight="Bold"
                             Text="{Binding Title}"
                             TextWrapping="Wrap" />
-                        <TextBlock
+                            <TextBlock
                             Margin="0,5,0,5"
                             FontSize="14"
                             Text="{Binding OgDescription}"
                             TextWrapping="Wrap" />
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontSize="12" Foreground="Gray">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="12" Foreground="Gray">
                                 <Run Text="comments: " />
                                 <Run Text="{Binding Counters.Comments, Mode=OneWay}" />
-                            </TextBlock>
-                            <TextBlock
+                                </TextBlock>
+                                <TextBlock
                                 Margin="10,0,0,0"
                                 FontSize="12"
                                 Foreground="Gray">
                                 <Run Text="favorites: " />
                                 <Run Text="{Binding Counters.Favorites, Mode=OneWay}" />
-                            </TextBlock>
-                            <TextBlock
+                                </TextBlock>
+                                <TextBlock
                                 Margin="10,0,0,0"
                                 FontSize="12"
                                 Foreground="Gray">
                                 <Run Text="views: " />
                                 <Run Text="{Binding Counters.Views, Mode=OneWay}" />
-                            </TextBlock>
-                            <TextBlock
+                                </TextBlock>
+                                <TextBlock
                                 Margin="10,0,0,0"
                                 FontSize="12"
                                 Foreground="Gray">
                                 <Run Text="likes: " />
                                 <Run Text="{Binding Likes.CounterLikes, Mode=OneWay}" />
-                            </TextBlock>
+                                </TextBlock>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-    </controls:RefreshContainer>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </controls:RefreshContainer>
+    </Grid>
 </Page>
