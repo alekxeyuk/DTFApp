@@ -9,6 +9,7 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace DTFApp
@@ -17,11 +18,28 @@ namespace DTFApp
     {
         private readonly HttpClient _httpClient;
         private long _entryId;
+        private readonly Grid _fullscreenOverlay = new Grid
+        {
+            Visibility = Visibility.Collapsed,
+            Background = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Black),
+            ManipulationMode = ManipulationModes.All
+        };
+
+        private readonly Image _fullscreenImage = new Image
+        {
+            Stretch = Windows.UI.Xaml.Media.Stretch.Uniform,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        private ScrollViewer _fullscreenZoomViewer;
 
         public EntryPage()
         {
             this.InitializeComponent();
             _httpClient = new HttpClient();
+            SetupFullscreenOverlay();
+            Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
         }
 
         protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
@@ -34,9 +52,28 @@ namespace DTFApp
             }
         }
 
+        protected override void OnNavigatingFrom(Windows.UI.Xaml.Navigation.NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+            if (_fullscreenOverlay.Visibility == Visibility.Visible)
+            {
+                HideFullscreenImage();
+                e.Cancel = true;
+            }
+        }
+
         protected override void OnNavigatedFrom(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
+        }
+
+        private void OnBackRequested(object sender, Windows.UI.Core.BackRequestedEventArgs e)
+        {
+            if (_fullscreenOverlay.Visibility == Visibility.Visible)
+            {
+                HideFullscreenImage();
+                e.Handled = true;
+            }
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -65,7 +102,7 @@ namespace DTFApp
 
                     if (entryResponse.Result.Blocks != null)
                     {
-                        var renderer = new BlockRendererFactory();
+                        var renderer = new BlockRendererFactory(ShowFullscreenImage);
                         foreach (var block in entryResponse.Result.Blocks)
                         {
                             var element = renderer.Render(block);
@@ -82,14 +119,78 @@ namespace DTFApp
                 System.Diagnostics.Debug.WriteLine($"Error loading entry: {ex.Message}");
             }
         }
+
+        private void SetupFullscreenOverlay()
+        {
+            _fullscreenOverlay.ManipulationDelta += (s, e) =>
+            {
+                if (Math.Abs(e.Cumulative.Translation.Y) > 150)
+                    HideFullscreenImage();
+            };
+
+            var closeButton = new Button
+            {
+                Content = "✕",
+                FontSize = 24,
+                Width = 48,
+                Height = 48,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, 20, 10, 0),
+                Background = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Black) { Opacity = 0.6 },
+                Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.White),
+                BorderThickness = new Thickness(0)
+            };
+            closeButton.Click += (s, e) => HideFullscreenImage();
+
+            _fullscreenZoomViewer = new ScrollViewer
+            {
+                Content = _fullscreenImage,
+                ZoomMode = ZoomMode.Enabled,
+                MinZoomFactor = 1.0f,
+                MaxZoomFactor = 4.0f,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
+            };
+
+            var bgGrid = new Grid();
+            bgGrid.Children.Add(_fullscreenZoomViewer);
+            bgGrid.Children.Add(closeButton);
+
+            _fullscreenOverlay.Children.Add(bgGrid);
+            var root = (Grid)this.Content;
+            root.Children.Add(_fullscreenOverlay);
+            Grid.SetRowSpan(_fullscreenOverlay, 2);
+        }
+
+        private void ShowFullscreenImage(string uuid)
+        {
+            var url = $"https://leonardo.osnova.io/{uuid}/";
+            var bounds = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds;
+            _fullscreenImage.MaxWidth = bounds.Width;
+            _fullscreenImage.MaxHeight = bounds.Height;
+            _fullscreenImage.Source = new BitmapImage(new Uri(url));
+            _fullscreenOverlay.Visibility = Visibility.Visible;
+        }
+
+        private void HideFullscreenImage()
+        {
+            _fullscreenImage.Source = null;
+            _fullscreenZoomViewer.ChangeView(null, null, 1.0f);
+            _fullscreenOverlay.Visibility = Visibility.Collapsed;
+        }
     }
 
     public class BlockRendererFactory
     {
         private readonly Dictionary<string, Func<Block, UIElement>> _renderers;
+        private readonly Action<string> _onImageTapped;
 
-        public BlockRendererFactory()
+        public BlockRendererFactory(Action<string> onImageTapped = null)
         {
+            _onImageTapped = onImageTapped;
             _renderers = new Dictionary<string, Func<Block, UIElement>>
             {
                 { "text", RenderText },
@@ -348,6 +449,7 @@ namespace DTFApp
                 {
                     var url = $"https://leonardo.osnova.io/{imgData.Uuid}/-/scale_crop/{screenWidth}x/";
                     var bitmap = new BitmapImage(new Uri(url));
+                    var uuid = imgData.Uuid;
                     var image = new Image
                     {
                         Source = bitmap,
@@ -355,6 +457,7 @@ namespace DTFApp
                         MaxHeight = 400,
                         Margin = new Thickness(0, 5, 0, 5)
                     };
+                    image.Tapped += (s, e) => _onImageTapped?.Invoke(uuid);
                     grid.Children.Add(image);
                     bitmap.ImageOpened += (s, e) => placeholder.Visibility = Visibility.Collapsed;
                     bitmap.ImageFailed += (s, e) => placeholder.Visibility = Visibility.Collapsed;
