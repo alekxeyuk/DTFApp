@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:DTFApp.Views"
     xmlns:models="using:DTFApp.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls"
@@ -26,6 +25,11 @@
             ItemsSource="{x:Bind ViewModel.NewsItems, Mode=OneWay}"
             ItemClick="NewsListView_ItemClick"
             IsItemClickEnabled="True">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <ItemsStackPanel />
@@ -48,33 +52,24 @@
                             FontSize="14"
                             Text="{Binding OgDescription}"
                             TextWrapping="Wrap" />
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontSize="12" Foreground="Gray">
-                                <Run Text="comments: " />
-                                <Run Text="{Binding Counters.Comments, Mode=OneWay}" />
-                                </TextBlock>
-                                <TextBlock
-                                Margin="10,0,0,0"
-                                FontSize="12"
-                                Foreground="Gray">
-                                <Run Text="favorites: " />
-                                <Run Text="{Binding Counters.Favorites, Mode=OneWay}" />
-                                </TextBlock>
-                                <TextBlock
-                                Margin="10,0,0,0"
-                                FontSize="12"
-                                Foreground="Gray">
-                                <Run Text="views: " />
-                                <Run Text="{Binding Counters.Views, Mode=OneWay}" />
-                                </TextBlock>
-                                <TextBlock
-                                Margin="10,0,0,0"
-                                FontSize="12"
-                                Foreground="Gray">
-                                <Run Text="likes: " />
-                                <Run Text="{Binding Likes.CounterLikes, Mode=OneWay}" />
-                                </TextBlock>
-                            </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8E1;" FontSize="12" Foreground="Gray"/>
+                                    <TextBlock FontSize="12" Foreground="Gray" Text="{Binding Likes.CounterLikes, Mode=OneWay}" Margin="3,0,10,0" />
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE90A;" FontSize="12" Foreground="Gray"/>
+                                    <TextBlock FontSize="12" Foreground="Gray" Text="{Binding Counters.Comments, Mode=OneWay}" Margin="3,0,10,0" />
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8A4;" FontSize="12" Foreground="Gray"/>
+                                    <TextBlock FontSize="12" Foreground="Gray" Text="{Binding Counters.Favorites, Mode=OneWay}" Margin="3,0,0,0" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE890;" FontSize="12" Foreground="Gray"/>
+                                    <TextBlock FontSize="12" Foreground="Gray" Text="{Binding Counters.Views, Mode=OneWay}" Margin="3,0,0,0" />
+                                </StackPanel>
+                            </Grid>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
