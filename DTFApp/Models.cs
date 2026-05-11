@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DTFApp
 {
@@ -140,7 +141,7 @@ namespace DTFApp
         public string Text { get; set; }
 
         [JsonProperty("items")]
-        public object[] Items { get; set; }
+        public JToken Items { get; set; }
 
         [JsonProperty("type")]
         public string ListType { get; set; }

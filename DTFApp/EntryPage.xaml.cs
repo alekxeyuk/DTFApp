@@ -392,9 +392,13 @@ namespace DTFApp
             var panel = new StackPanel { Margin = new Thickness(0, 10, 0, 10) };
             int screenWidth = (int)Window.Current.Bounds.Width;
 
-            foreach (var itemObj in data.Items)
+            var itemsArray = data.Items as JArray;
+            if (itemsArray == null) return null;
+
+            foreach (var itemToken in itemsArray)
             {
-                if (!(itemObj is JObject jObject)) continue;
+                var jObject = itemToken as JObject;
+                if (jObject == null) continue;
 
                 var mediaItem = jObject.ToObject<MediaItem>();
                 if (mediaItem?.Image?.Type != "image") continue;
@@ -509,14 +513,15 @@ namespace DTFApp
         private UIElement RenderList(Block block)
         {
             var data = block.Data;
-            if (data?.Items == null) return null;
+            var items = data?.Items as JArray;
+            if (items == null) return null;
 
             var panel = new StackPanel { Margin = new Thickness(0, 5, 0, 5) };
             bool isOrdered = data.ListType == "OL";
 
-            for (int i = 0; i < data.Items.Length; i++)
+            for (int i = 0; i < items.Count; i++)
             {
-                var item = data.Items[i]?.ToString();
+                var item = items[i]?.ToString();
                 if (string.IsNullOrEmpty(item)) continue;
 
                 var prefix = isOrdered ? $"{i + 1}. " : "• ";
