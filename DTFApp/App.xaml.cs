@@ -77,8 +77,7 @@ namespace DTFApp
 
         private void App_BackRequested(object sender, BackRequestedEventArgs e)
         {
-            var rootFrame = Window.Current.Content as Frame;
-            if (rootFrame != null && rootFrame.CanGoBack)
+            if (Window.Current.Content is Frame rootFrame && rootFrame.CanGoBack)
             {
                 rootFrame.GoBack();
                 e.Handled = true;
