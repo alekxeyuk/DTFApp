@@ -61,6 +61,7 @@ namespace DTFApp.Views
         protected override void OnNavigatedFrom(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
+            Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested -= OnBackRequested;
         }
 
         private void OnBackRequested(object sender, Windows.UI.Core.BackRequestedEventArgs e)

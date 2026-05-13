@@ -13,6 +13,8 @@ namespace DTFApp
     /// </summary>
     sealed partial class App : Application
     {
+        private static bool _backRequestedRegistered;
+
         /// <summary>
         /// Инициализирует одноэлементный объект приложения.  Это первая выполняемая строка разрабатываемого
         /// кода; поэтому она является логическим эквивалентом main() или WinMain().
@@ -71,7 +73,11 @@ namespace DTFApp
                         rootFrame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
                 };
 
-                SystemNavigationManager.GetForCurrentView().BackRequested += App_BackRequested;
+                if (!_backRequestedRegistered)
+                {
+                    SystemNavigationManager.GetForCurrentView().BackRequested += App_BackRequested;
+                    _backRequestedRegistered = true;
+                }
             }
         }
 
