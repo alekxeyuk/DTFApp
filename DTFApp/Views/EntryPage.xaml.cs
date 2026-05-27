@@ -33,6 +33,7 @@ namespace DTFApp.Views
         public EntryPage()
         {
             this.InitializeComponent();
+            this.DataContext = this;
             _apiService = new DtfApiService();
             SetupFullscreenOverlay();
             Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;

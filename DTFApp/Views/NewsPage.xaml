@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" Content="&lt; Back" Click="BackButton_Click" Margin="10,10,10,0"/>
+        <Button Grid.Row="0" Content="&lt; Back" Click="BackButton_Click" Margin="5"/>
 
         <controls:RefreshContainer x:Name="RefreshContainer" Grid.Row="1" RefreshRequested="RefreshContainer_RefreshRequested">
             <ListView

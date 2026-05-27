@@ -16,6 +16,9 @@ namespace DTFApp.Models
 
         [JsonProperty("blocks")]
         public Block[] Blocks { get; set; }
+
+        [JsonProperty("counters")]
+        public Counters Counters { get; set; }
     }
 
     public class Block

@@ -16,12 +16,15 @@ namespace DTFApp.ViewModels
             {
                 SetProperty(ref _entry, value);
                 OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(CommentsCount));
             }
         }
 
         public string Title => Entry?.Result?.Title;
 
         public Block[] Blocks => Entry?.Result?.Blocks;
+
+        public long CommentsCount => Entry?.Result?.Counters?.Comments ?? 0;
 
         public EntryViewModel() : this(new DtfApiService()) { }
 
