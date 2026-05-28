@@ -21,7 +21,7 @@ namespace DTFApp.Views
 
         private readonly Image _fullscreenImage = new Image
         {
-            Stretch = Windows.UI.Xaml.Media.Stretch.Uniform,
+            Stretch = Stretch.Uniform,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
@@ -32,8 +32,8 @@ namespace DTFApp.Views
 
         public EntryPage()
         {
-            this.InitializeComponent();
-            this.DataContext = this;
+            InitializeComponent();
+            DataContext = this;
             _apiService = new DtfApiService();
             SetupFullscreenOverlay();
             Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
@@ -76,7 +76,15 @@ namespace DTFApp.Views
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Frame.GoBack();
+            Frame.GoBack();
+        }
+
+        private void CommentsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_entryId != 0)
+            {
+                Frame.Navigate(typeof(CommentsPage), _entryId);
+            }
         }
 
         private async void LoadEntryAsync(long id)
@@ -151,7 +159,7 @@ namespace DTFApp.Views
             bgGrid.Children.Add(closeButton);
 
             _fullscreenOverlay.Children.Add(bgGrid);
-            var root = (Grid)this.Content;
+            var root = (Grid)Content;
             root.Children.Add(_fullscreenOverlay);
             Grid.SetRowSpan(_fullscreenOverlay, 2);
         }

@@ -37,6 +37,12 @@ namespace DTFApp.Services
             return JsonConvert.DeserializeObject<EntryResponse>(response);
         }
 
+        public async Task<CommentsResponse> GetCommentsAsync(long contentId)
+        {
+            var response = await _httpClient.GetStringAsync($"https://api.dtf.ru/v2.0/comments?contentId={contentId}");
+            return JsonConvert.DeserializeObject<CommentsResponse>(response);
+        }
+
         public async Task<QuizResultResponse> GetQuizResultsAsync(string hash)
         {
             var response = await _httpClient.GetStringAsync($"https://api.dtf.ru/v2.0/quiz/{hash}/results");

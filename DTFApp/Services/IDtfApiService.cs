@@ -7,6 +7,7 @@ namespace DTFApp.Services
     {
         Task<NewsResult> GetNewsAsync(long lastId = 0);
         Task<EntryResponse> GetEntryAsync(long id);
+        Task<CommentsResponse> GetCommentsAsync(long contentId);
         Task<QuizResultResponse> GetQuizResultsAsync(string hash);
         Task<string> LoginAsync(string email, string password);
         Task<string> RegisterAsync(string email, string password, string name);
