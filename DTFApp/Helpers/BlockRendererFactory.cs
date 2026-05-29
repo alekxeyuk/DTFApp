@@ -170,6 +170,21 @@ namespace DTFApp.Helpers
                         }
                     };
                     mediaElement.MediaFailed += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+
+                    grid.EffectiveViewportChanged += (s, e) =>
+                    {
+                        bool inView = e.EffectiveViewport.Height > 0
+                            && e.EffectiveViewport.Top < Window.Current.Bounds.Height
+                            && e.EffectiveViewport.Bottom > 0;
+                        if (inView && !imgData.HasAudio)
+                        {
+                            mediaElement.Play();
+                        }
+                        else
+                        {
+                            mediaElement.Pause();
+                        }
+                    };
                 }
                 else
                 {
