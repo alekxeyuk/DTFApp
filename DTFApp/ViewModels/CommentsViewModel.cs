@@ -70,6 +70,8 @@ namespace DTFApp.ViewModels
                 _hasLoadedComments = false;
                 OnPropertyChanged(nameof(EmptyVisibility));
 
+                await BadgeCacheService.UpdateBadgesAsync();
+
                 var response = await _apiService.GetCommentsAsync(contentId);
                 if (response?.Result?.Items == null) return;
 
@@ -105,6 +107,8 @@ namespace DTFApp.ViewModels
 
         public string AuthorName => Comment?.Author?.Name ?? "Unknown";
         public string AvatarUrl => Comment?.Author?.AvatarUrl;
+        public string BadgeUrl => BadgeCacheService.GetBadgeUrl(Comment?.Author?.BadgeId);
+        public Visibility BadgeVisibility => string.IsNullOrWhiteSpace(BadgeUrl) ? Visibility.Collapsed : Visibility.Visible;
         public string TimeAgo => FormatTimeAgo(Comment?.Date ?? 0);
         public string NicknameText
         {
@@ -176,7 +180,8 @@ namespace DTFApp.ViewModels
                 }
                 else if (type == "link")
                 {
-                    var uuid = !(data["image"]?["data"] is JObject imageData) ? null : (string)imageData["uuid"];
+                    var image = data["image"] as JObject;
+                    var uuid = !(image?["data"] is JObject imageData) ? null : (string)imageData["uuid"];
                     var imageUrl = string.IsNullOrEmpty(uuid)
                         ? null
                         : uuid.StartsWith("http")

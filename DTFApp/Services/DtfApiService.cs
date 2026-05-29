@@ -43,6 +43,12 @@ namespace DTFApp.Services
             return JsonConvert.DeserializeObject<CommentsResponse>(response);
         }
 
+        public async Task<BadgeAssetsResponse> GetBadgeAssetsAsync()
+        {
+            var response = await _httpClient.GetStringAsync("https://api.dtf.ru/v2.0/assets?type=badges");
+            return JsonConvert.DeserializeObject<BadgeAssetsResponse>(response);
+        }
+
         public async Task<QuizResultResponse> GetQuizResultsAsync(string hash)
         {
             var response = await _httpClient.GetStringAsync($"https://api.dtf.ru/v2.0/quiz/{hash}/results");

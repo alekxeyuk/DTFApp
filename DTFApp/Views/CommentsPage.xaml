@@ -61,11 +61,26 @@
                                 </Ellipse>
 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="14"
-                                        FontWeight="SemiBold"
-                                        Text="{x:Bind AuthorName}"
-                                        TextTrimming="CharacterEllipsis"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            FontSize="14"
+                                            FontWeight="SemiBold"
+                                            Text="{x:Bind AuthorName}"
+                                            TextTrimming="CharacterEllipsis"/>
+                                        <Image
+                                            Grid.Column="1"
+                                            Width="18"
+                                            Height="18"
+                                            Margin="5,0,0,0"
+                                            Source="{Binding BadgeUrl}"
+                                            Stretch="Uniform"
+                                            Visibility="{x:Bind BadgeVisibility}"/>
+                                    </Grid>
                                     <Grid Margin="0,1,0,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>

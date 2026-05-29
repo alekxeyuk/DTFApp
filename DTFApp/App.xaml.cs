@@ -1,5 +1,6 @@
 ﻿using System;
 using Windows.ApplicationModel;
+using DTFApp.Services;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -78,6 +79,8 @@ namespace DTFApp
                     SystemNavigationManager.GetForCurrentView().BackRequested += App_BackRequested;
                     _backRequestedRegistered = true;
                 }
+
+                _ = BadgeCacheService.UpdateBadgesAsync();
             }
         }
 

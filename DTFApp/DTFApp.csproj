@@ -131,6 +131,7 @@
     <Compile Include="Helpers\BlockRendererFactory.cs" />
     <Compile Include="Helpers\HtmlHelper.cs" />
     <Compile Include="Helpers\VisualTreeExtensions.cs" />
+    <Compile Include="Models\BadgeModels.cs" />
     <Compile Include="Models\BlockRenderer.cs" />
     <Compile Include="Models\CommonModels.cs" />
     <Compile Include="Models\CommentModels.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="Models\NewsModels.cs" />
     <Compile Include="Models\QuizModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\BadgeCacheService.cs" />
     <Compile Include="Services\DtfApiService.cs" />
     <Compile Include="Services\IDtfApiService.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />

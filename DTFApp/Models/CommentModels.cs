@@ -66,6 +66,9 @@ namespace DTFApp.Models
         [JsonProperty("nickname")]
         public string Nickname { get; set; }
 
+        [JsonProperty("badgeId")]
+        public string BadgeId { get; set; }
+
         [JsonProperty("avatar")]
         public CommentAvatar Avatar { get; set; }
 
