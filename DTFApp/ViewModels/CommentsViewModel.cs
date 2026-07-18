@@ -3,6 +3,7 @@ using DTFApp.Models;
 using DTFApp.Services;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Threading.Tasks;
@@ -75,10 +76,28 @@ namespace DTFApp.ViewModels
                 var response = await _apiService.GetCommentsAsync(contentId);
                 if (response?.Result?.Items == null) return;
 
+                var byId = new Dictionary<long, CommentViewItem>();
+                var ordered = new List<CommentViewItem>();
                 foreach (var comment in response.Result.Items)
                 {
-                    Comments.Add(new CommentViewItem(comment));
+                    var item = new CommentViewItem(comment);
+                    Comments.Add(item);
+                    ordered.Add(item);
+                    byId[item.Id] = item;
                 }
+
+                BuildCommentTree(ordered, byId);
+                var roots = new List<CommentViewItem>();
+                foreach (var item in ordered)
+                {
+                    var replyTo = item.Comment?.ReplyTo ?? 0;
+                    if (replyTo == 0 || !byId.ContainsKey(replyTo))
+                    {
+                        roots.Add(item);
+                    }
+                }
+                foreach (var root in roots)
+                    ItemVisibility(root, parentHidden: false);
 
                 OnPropertyChanged(nameof(EmptyVisibility));
             }
@@ -88,22 +107,110 @@ namespace DTFApp.ViewModels
                 IsLoading = false;
             }
         }
+
+        private static void BuildCommentTree(List<CommentViewItem> ordered, Dictionary<long, CommentViewItem> byId)
+        {
+            foreach (var item in ordered)
+            {
+                var replyTo = item.Comment?.ReplyTo ?? 0;
+                if (replyTo > 0 && byId.TryGetValue(replyTo, out var parent))
+                {
+                    parent.Children.Add(item);
+                    parent.HasReplies = true;
+                }
+            }
+        }
+
+        public void ToggleCollapse(CommentViewItem item)
+        {
+            if (item == null) return;
+            item.IsExpanded = !item.IsExpanded;
+            ItemVisibility(item, parentHidden: false);
+        }
+
+        private void ItemVisibility(CommentViewItem item, bool parentHidden)
+        {
+            if (item.IsHiddenByCollapse && parentHidden) return;
+
+            item.IsHiddenByCollapse = parentHidden;
+            var myHidden = parentHidden || (!item.IsExpanded && item.Children.Count > 0);
+
+            foreach (var child in item.Children)
+            {
+                ItemVisibility(child, myHidden);
+            }
+        }
     }
 
-    public class CommentViewItem
+    public class CommentViewItem : BaseViewModel
     {
         private const int MaxIndentLevel = 5;
         private readonly string _text;
+        private readonly Thickness _indentMargin;
+        private bool _isExpanded = true;
+        private bool _hasReplies;
+        private bool _isHiddenByCollapse;
 
         public CommentViewItem(Comment comment)
         {
             Comment = comment;
             MediaAttachments = CreateMediaAttachments(comment?.Media);
             _text = WebUtility.HtmlDecode(HtmlHelper.StripHtml(comment?.Text ?? ""));
+
+            var level = comment?.Level ?? 0;
+            if (level < 0) level = 0;
+            if (level > MaxIndentLevel) level = MaxIndentLevel;
+            _indentMargin = new Thickness(level * 10, level == 0 ? 12 : 0, 0, 0);
         }
 
         public Comment Comment { get; }
         public ObservableCollection<CommentMediaAttachmentViewItem> MediaAttachments { get; }
+        public List<CommentViewItem> Children { get; } = new List<CommentViewItem>();
+
+        public long Id => Comment?.Id ?? 0;
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set
+            {
+                if (SetProperty(ref _isExpanded, value))
+                {
+                    OnPropertyChanged(nameof(ExpandIconGlyph));
+                }
+            }
+        }
+
+        public bool HasReplies
+        {
+            get => _hasReplies;
+            set
+            {
+                if (_hasReplies != value)
+                {
+                    _hasReplies = value;
+                    OnPropertyChanged(nameof(ExpandToggleVisibility));
+                }
+            }
+        }
+
+        public bool IsHiddenByCollapse
+        {
+            get => _isHiddenByCollapse;
+            set
+            {
+                if (SetProperty(ref _isHiddenByCollapse, value))
+                {
+                    OnPropertyChanged(nameof(RowVisibility));
+                }
+            }
+        }
+
+        public Visibility RowVisibility => _isHiddenByCollapse ? Visibility.Collapsed : Visibility.Visible;
+
+        public Visibility ExpandToggleVisibility => _hasReplies ? Visibility.Visible : Visibility.Collapsed;
+
+        public string ExpandIconGlyph => _isExpanded ? "\xE70D" : "\xE76C";
 
         public string AuthorName => Comment?.Author?.Name ?? "Unknown";
         public string AvatarUrl => Comment?.Author?.AvatarUrl;
@@ -123,16 +230,7 @@ namespace DTFApp.ViewModels
 
         public Visibility TextVisibility => string.IsNullOrWhiteSpace(Text) ? Visibility.Collapsed : Visibility.Visible;
 
-        public Thickness IndentMargin
-        {
-            get
-            {
-                var level = Comment?.Level ?? 0;
-                if (level < 0) level = 0;
-                if (level > MaxIndentLevel) level = MaxIndentLevel;
-                return new Thickness(level * 10, level == 0 ? 12 : 0, 0, 0);
-            }
-        }
+        public Thickness IndentMargin => _indentMargin;
 
         private static string FormatTimeAgo(long unixTime)
         {

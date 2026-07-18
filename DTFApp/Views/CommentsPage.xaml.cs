@@ -34,6 +34,28 @@ namespace DTFApp.Views
             }
         }
 
+        private void ExpandToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("=== Toggle button CLICK event fired ===");
+            if (sender is FrameworkElement fe)
+            {
+                System.Diagnostics.Debug.WriteLine($"Button DataContext: {fe.DataContext?.GetType().Name}");
+                if (fe.DataContext is CommentViewItem item)
+                {
+                    System.Diagnostics.Debug.WriteLine($"DataContext item: {item.Id}, HasReplies: {item.HasReplies}, Children: {item.Children.Count}");
+                    ViewModel.ToggleCollapse(item);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"No valid DataContext: {fe.DataContext}");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Sender is not FrameworkElement: {sender?.GetType().Name}");
+            }
+        }
+
         private async void LoadCommentsAsync(long contentId)
         {
             try
