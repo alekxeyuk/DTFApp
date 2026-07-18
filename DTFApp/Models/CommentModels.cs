@@ -1,6 +1,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace DTFApp.Models
 {
@@ -34,7 +36,8 @@ namespace DTFApp.Models
         public long LastModificationDate { get; set; }
 
         [JsonProperty("media")]
-        public JArray Media { get; set; }
+        [JsonConverter(typeof(CommentMediaItemConverter))]
+        public List<CommentMediaItem> Media { get; set; }
 
         [JsonProperty("level")]
         public int Level { get; set; }
@@ -93,14 +96,75 @@ namespace DTFApp.Models
         public CommentMediaData Data { get; set; }
     }
 
-    public class CommentMediaAttachment
+    public class CommentMediaItem
     {
         public string Type { get; set; }
-        public string Url { get; set; }
+        public string Uuid { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Hostname { get; set; }
-        public bool IsLink => Type == "link";
+    }
+
+    public class CommentMediaItemConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType) =>
+            objectType == typeof(CommentMediaItem) ||
+            objectType == typeof(List<CommentMediaItem>);
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.StartArray)
+            {
+                var array = JArray.Load(reader);
+                var list = new List<CommentMediaItem>();
+                foreach (var element in array)
+                {
+                    list.Add(ConvertElement(element));
+                }
+                return list;
+            }
+
+            var obj = JObject.Load(reader);
+            return ConvertToken(obj);
+        }
+
+        private static CommentMediaItem ConvertElement(JToken token)
+        {
+            if (token is JObject obj)
+                return ConvertToken(obj);
+            return null;
+        }
+
+        private static CommentMediaItem ConvertToken(JObject obj)
+        {
+            var type = (string)obj["type"];
+            var data = obj["data"] as JObject;
+
+            var item = new CommentMediaItem { Type = type };
+
+            if (type == "image" || type == "movie")
+            {
+                item.Uuid = data != null ? (string)data["uuid"] : null;
+            }
+            else if (type == "link" && data != null)
+            {
+                item.Title = WebUtility.HtmlDecode((string)data["title"]);
+                item.Description = WebUtility.HtmlDecode((string)data["description"]);
+                item.Hostname = WebUtility.HtmlDecode((string)data["hostname"]);
+
+                var image = data["image"] as JObject;
+                var imageData = image?["data"] as JObject;
+                if (imageData != null)
+                    item.Uuid = (string)imageData["uuid"];
+            }
+
+            return item;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class CommentMediaData

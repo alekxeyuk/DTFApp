@@ -1,7 +1,6 @@
 using DTFApp.Helpers;
 using DTFApp.Models;
 using DTFApp.Services;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -145,8 +144,6 @@ namespace DTFApp.ViewModels
     public class CommentViewItem : BaseViewModel
     {
         private const int MaxIndentLevel = 5;
-        private readonly string _text;
-        private readonly Thickness _indentMargin;
         private bool _isExpanded = true;
         private bool _hasReplies;
         private bool _isHiddenByCollapse;
@@ -155,12 +152,12 @@ namespace DTFApp.ViewModels
         {
             Comment = comment;
             MediaAttachments = CreateMediaAttachments(comment?.Media);
-            _text = WebUtility.HtmlDecode(HtmlHelper.StripHtml(comment?.Text ?? ""));
+            Text = WebUtility.HtmlDecode(HtmlHelper.StripHtml(comment?.Text ?? ""));
 
             var level = comment?.Level ?? 0;
             if (level < 0) level = 0;
             if (level > MaxIndentLevel) level = MaxIndentLevel;
-            _indentMargin = new Thickness(level * 10, level == 0 ? 12 : 0, 0, 0);
+            IndentMargin = new Thickness(level * 10, level == 0 ? 12 : 0, 0, 0);
         }
 
         public Comment Comment { get; }
@@ -226,11 +223,11 @@ namespace DTFApp.ViewModels
             }
         }
         public Visibility NicknameVisibility => string.IsNullOrWhiteSpace(NicknameText) ? Visibility.Collapsed : Visibility.Visible;
-        public string Text => _text;
+        public string Text { get; }
 
         public Visibility TextVisibility => string.IsNullOrWhiteSpace(Text) ? Visibility.Collapsed : Visibility.Visible;
 
-        public Thickness IndentMargin => _indentMargin;
+        public Thickness IndentMargin { get; }
 
         private static string FormatTimeAgo(long unixTime)
         {
@@ -249,21 +246,16 @@ namespace DTFApp.ViewModels
             return $"{(int)(elapsed.TotalDays / 365)}г";
         }
 
-        private static ObservableCollection<CommentMediaAttachmentViewItem> CreateMediaAttachments(JArray media)
+        private static ObservableCollection<CommentMediaAttachmentViewItem> CreateMediaAttachments(List<CommentMediaItem> media)
         {
             var attachments = new ObservableCollection<CommentMediaAttachmentViewItem>();
             if (media == null) return attachments;
 
-            foreach (var token in media)
+            foreach (var item in media)
             {
-                if (!(token is JObject obj)) continue;
-
-                var type = (string)obj["type"];
-                if (!(obj["data"] is JObject data)) continue;
-
-                if (type == "image" || type == "movie")
+                if (item.Type == "image" || item.Type == "movie")
                 {
-                    var uuid = (string)data["uuid"];
+                    var uuid = item.Uuid;
                     if (string.IsNullOrEmpty(uuid)) continue;
 
                     var url = uuid.StartsWith("http")
@@ -272,14 +264,13 @@ namespace DTFApp.ViewModels
 
                     attachments.Add(new CommentMediaAttachmentViewItem
                     {
-                        Type = type,
+                        Type = item.Type,
                         Url = url
                     });
                 }
-                else if (type == "link")
+                else if (item.Type == "link")
                 {
-                    var image = data["image"] as JObject;
-                    var uuid = !(image?["data"] is JObject imageData) ? null : (string)imageData["uuid"];
+                    var uuid = item.Uuid;
                     var imageUrl = string.IsNullOrEmpty(uuid)
                         ? null
                         : uuid.StartsWith("http")
@@ -288,11 +279,11 @@ namespace DTFApp.ViewModels
 
                     attachments.Add(new CommentMediaAttachmentViewItem
                     {
-                        Type = type,
+                        Type = item.Type,
                         Url = imageUrl,
-                        Title = WebUtility.HtmlDecode((string)data["title"]),
-                        Description = WebUtility.HtmlDecode((string)data["description"]),
-                        Hostname = WebUtility.HtmlDecode((string)data["hostname"])
+                        Title = item.Title,
+                        Description = item.Description,
+                        Hostname = item.Hostname
                     });
                 }
             }
