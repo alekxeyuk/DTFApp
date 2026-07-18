@@ -1,4 +1,5 @@
 using DTFApp.Models;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DTFApp.Services
@@ -7,7 +8,7 @@ namespace DTFApp.Services
     {
         Task<NewsResult> GetNewsAsync(long lastId = 0);
         Task<EntryResponse> GetEntryAsync(long id);
-        Task<CommentsResponse> GetCommentsAsync(long contentId);
+        Task<CommentsResponse> GetCommentsAsync(long contentId, CancellationToken ct = default);
         Task<BadgeAssetsResponse> GetBadgeAssetsAsync();
         Task<QuizResultResponse> GetQuizResultsAsync(string hash);
         Task<string> LoginAsync(string email, string password);

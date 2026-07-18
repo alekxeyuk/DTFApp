@@ -2,6 +2,7 @@ using DTFApp.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -30,7 +31,7 @@ namespace DTFApp.Services
             }
         }
 
-        public static Task UpdateBadgesAsync()
+        public static Task UpdateBadgesAsync(CancellationToken ct = default)
         {
             lock (_lock)
             {

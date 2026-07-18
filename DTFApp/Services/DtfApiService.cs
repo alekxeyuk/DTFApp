@@ -2,6 +2,7 @@ using DTFApp.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DTFApp.Services
@@ -37,7 +38,7 @@ namespace DTFApp.Services
             return JsonConvert.DeserializeObject<EntryResponse>(response);
         }
 
-        public async Task<CommentsResponse> GetCommentsAsync(long contentId)
+        public async Task<CommentsResponse> GetCommentsAsync(long contentId, CancellationToken ct = default)
         {
             var response = await _httpClient.GetStringAsync($"https://api.dtf.ru/v2.0/comments?contentId={contentId}");
             return JsonConvert.DeserializeObject<CommentsResponse>(response);

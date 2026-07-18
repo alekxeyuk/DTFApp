@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 
@@ -58,7 +59,7 @@ namespace DTFApp.ViewModels
             _apiService = apiService;
         }
 
-        public async Task LoadCommentsAsync(long contentId)
+        public async Task LoadCommentsAsync(long contentId, CancellationToken ct = default)
         {
             if (_isLoading) return;
             IsLoading = true;
@@ -70,9 +71,9 @@ namespace DTFApp.ViewModels
                 _hasLoadedComments = false;
                 OnPropertyChanged(nameof(EmptyVisibility));
 
-                await BadgeCacheService.UpdateBadgesAsync();
+                await BadgeCacheService.UpdateBadgesAsync(ct);
 
-                var response = await _apiService.GetCommentsAsync(contentId);
+                var response = await _apiService.GetCommentsAsync(contentId, ct);
                 if (response?.Result?.Items == null) return;
 
                 var byId = new Dictionary<long, CommentViewItem>();
@@ -183,9 +184,8 @@ namespace DTFApp.ViewModels
             get => _hasReplies;
             set
             {
-                if (_hasReplies != value)
+                if (SetProperty(ref _hasReplies, value))
                 {
-                    _hasReplies = value;
                     OnPropertyChanged(nameof(ExpandToggleVisibility));
                 }
             }
