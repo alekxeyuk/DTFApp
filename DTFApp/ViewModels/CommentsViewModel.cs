@@ -1,5 +1,6 @@
 using DTFApp.Models;
 using DTFApp.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -95,6 +96,15 @@ namespace DTFApp.ViewModels
                 }
                 foreach (var root in roots)
                     ItemVisibility(root, parentHidden: false);
+            }
+            catch (System.OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                System.Diagnostics.Debug.WriteLine($"Error loading comments for {contentId}: {ex}");
             }
             finally
             {

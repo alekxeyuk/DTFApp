@@ -1,5 +1,4 @@
 using DTFApp.ViewModels;
-using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -58,15 +57,7 @@ namespace DTFApp.Views
 
         private async void LoadCommentsAsync(long contentId)
         {
-            try
-            {
-                await ViewModel.LoadCommentsAsync(contentId);
-            }
-            catch (Exception ex)
-            {
-                ViewModel.ErrorMessage = ex.Message;
-                System.Diagnostics.Debug.WriteLine($"Error loading comments for {_contentId}: {ex.Message}");
-            }
+            await ViewModel.LoadCommentsAsync(contentId);
         }
     }
 }
