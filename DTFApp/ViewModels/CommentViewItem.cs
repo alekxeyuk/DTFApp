@@ -21,6 +21,7 @@ namespace DTFApp.ViewModels
             Comment = comment;
             MediaAttachments = CreateMediaAttachments(comment?.Media);
             Text = WebUtility.HtmlDecode(HtmlHelper.StripHtml(comment?.Text ?? ""));
+            TextSegments = ParseTextSegments(Text);
 
             var level = comment?.Level ?? 0;
             if (level < 0) level = 0;
@@ -86,6 +87,12 @@ namespace DTFApp.ViewModels
 
         public Visibility TextVisibility => string.IsNullOrWhiteSpace(Text) ? Visibility.Collapsed : Visibility.Visible;
 
+        public List<CommentTextSegment> TextSegments { get; }
+
+        public Visibility TextSegmentsVisibility => TextSegments == null || TextSegments.Count == 0
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+
         public Thickness IndentMargin { get; }
 
         private static string FormatTimeAgo(long unixTime)
@@ -103,6 +110,78 @@ namespace DTFApp.ViewModels
             if (elapsed.TotalDays < 30) return $"{(int)(elapsed.TotalDays / 7)}н";
             if (elapsed.TotalDays < 365) return $"{(int)(elapsed.TotalDays / 30)}мес";
             return $"{(int)(elapsed.TotalDays / 365)}г";
+        }
+
+        private static string CompactLineBreaks(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            var sb = new System.Text.StringBuilder(text.Length);
+            for (int i = 0; i < text.Length;)
+            {
+                if (i + 1 < text.Length && text[i] == '\r' && text[i + 1] == '\n')
+                {
+                    int count = 0;
+                    while (i + 1 < text.Length && text[i] == '\r' && text[i + 1] == '\n')
+                    {
+                        count++;
+                        i += 2;
+                    }
+
+                    sb.Append('\r').Append('\n');
+                    if (count % 2 == 0)
+                        sb.Append('\r').Append('\n');
+                }
+                else
+                {
+                    sb.Append(text[i]);
+                    i++;
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private static List<CommentTextSegment> ParseTextSegments(string text)
+        {
+            var segments = new List<CommentTextSegment>();
+            if (string.IsNullOrWhiteSpace(text)) return segments;
+
+            text = CompactLineBreaks(text);
+
+            var lines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            bool currentIsQuote = false;
+            var buffer = new List<string>();
+
+            foreach (var line in lines)
+            {
+                bool isQuoteLine = line.StartsWith(">");
+                string content = isQuoteLine ? line.Substring(1).TrimStart() : line;
+
+                if (isQuoteLine != currentIsQuote && buffer.Count > 0)
+                {
+                    segments.Add(new CommentTextSegment
+                    {
+                        Text = string.Join("\n", buffer),
+                        IsQuote = currentIsQuote
+                    });
+                    buffer.Clear();
+                }
+
+                buffer.Add(content);
+                currentIsQuote = isQuoteLine;
+            }
+
+            if (buffer.Count > 0)
+            {
+                segments.Add(new CommentTextSegment
+                {
+                    Text = string.Join("\n", buffer),
+                    IsQuote = currentIsQuote
+                });
+            }
+
+            return segments;
         }
 
         private static ObservableCollection<CommentMediaAttachmentViewItem> CreateMediaAttachments(List<CommentMediaItem> media)
@@ -149,5 +228,11 @@ namespace DTFApp.ViewModels
 
             return attachments;
         }
+    }
+
+    public class CommentTextSegment
+    {
+        public string Text { get; set; }
+        public bool IsQuote { get; set; }
     }
 }

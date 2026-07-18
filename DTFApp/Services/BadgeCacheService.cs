@@ -80,8 +80,7 @@ namespace DTFApp.Services
                     {
                         if (string.IsNullOrWhiteSpace(badge?.Id) || string.IsNullOrWhiteSpace(badge.StaticUuid)) continue;
 
-                        string existingUuid;
-                        if (!_badgeStaticUuids.TryGetValue(badge.Id, out existingUuid) || existingUuid != badge.StaticUuid)
+                        if (!_badgeStaticUuids.TryGetValue(badge.Id, out string existingUuid) || existingUuid != badge.StaticUuid)
                         {
                             _badgeStaticUuids[badge.Id] = badge.StaticUuid;
                             changed = true;

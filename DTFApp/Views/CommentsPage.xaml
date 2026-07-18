@@ -11,6 +11,7 @@
 
     <Page.Resources>
         <helpers:BoolToGlyphConverter x:Key="BoolToGlyphConverter"/>
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Page.Resources>
 
     <Grid>
@@ -127,13 +128,35 @@
                                 </StackPanel>
                             </Grid>
 
-                            <TextBlock
+                            <ItemsControl
                                 Margin="0,8,0,0"
-                                FontSize="16"
-                                FontWeight="SemiBold"
-                                Text="{x:Bind Text}"
-                                TextWrapping="Wrap"
-                                Visibility="{x:Bind TextVisibility}"/>
+                                ItemsSource="{x:Bind TextSegments}"
+                                Visibility="{x:Bind TextSegmentsVisibility}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:CommentTextSegment">
+                                        <Grid>
+                                            <TextBlock
+                                                FontSize="16"
+                                                FontWeight="SemiBold"
+                                                Text="{x:Bind Text}"
+                                                TextWrapping="Wrap"
+                                                Visibility="{x:Bind IsQuote, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Invert}"/>
+                                            <Border
+                                                BorderBrush="LightGray"
+                                                BorderThickness="3,0,0,0"
+                                                Margin="0,4,0,4"
+                                                Padding="8,0,0,0"
+                                                Visibility="{x:Bind IsQuote, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <TextBlock
+                                                    FontSize="16"
+                                                    FontStyle="Italic"
+                                                    Text="{x:Bind Text}"
+                                                    TextWrapping="Wrap"/>
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                             <ItemsControl
                                 Margin="0,0,0,0"
                                 ItemsSource="{x:Bind MediaAttachments}">
