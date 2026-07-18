@@ -62,15 +62,15 @@ namespace DTFApp.ViewModels
         public async Task LoadCommentsAsync(long contentId, CancellationToken ct = default)
         {
             if (_isLoading) return;
+
             IsLoading = true;
             ErrorMessage = null;
+            Comments.Clear();
+            _hasLoadedComments = false;
+            OnPropertyChanged(nameof(EmptyVisibility));
 
             try
             {
-                Comments.Clear();
-                _hasLoadedComments = false;
-                OnPropertyChanged(nameof(EmptyVisibility));
-
                 await BadgeCacheService.UpdateBadgesAsync(ct);
 
                 var response = await _apiService.GetCommentsAsync(contentId, ct);
@@ -98,8 +98,6 @@ namespace DTFApp.ViewModels
                 }
                 foreach (var root in roots)
                     ItemVisibility(root, parentHidden: false);
-
-                OnPropertyChanged(nameof(EmptyVisibility));
             }
             finally
             {
