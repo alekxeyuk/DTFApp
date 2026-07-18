@@ -4,9 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:helpers="using:DTFApp.Helpers"
     xmlns:viewModels="using:DTFApp.ViewModels"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
+
+    <Page.Resources>
+        <helpers:BoolToGlyphConverter x:Key="BoolToGlyphConverter"/>
+    </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -67,7 +72,7 @@
                                     <TextBlock
                                         FontFamily="Segoe MDL2 Assets"
                                         FontSize="14"
-                                        Text="{Binding ExpandIconGlyph, Mode=OneWay}"/>
+                                        Text="{Binding IsExpanded, Converter={StaticResource BoolToGlyphConverter}, Mode=OneWay}"/>
                                 </Button>
 
                                 <Ellipse

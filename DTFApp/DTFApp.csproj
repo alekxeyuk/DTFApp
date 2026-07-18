@@ -129,6 +129,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\BoolToGlyphConverter.cs" />
     <Compile Include="Helpers\BlockRendererFactory.cs" />
     <Compile Include="Helpers\HtmlHelper.cs" />
     <Compile Include="Helpers\VisualTreeExtensions.cs" />
@@ -145,7 +146,9 @@
     <Compile Include="Services\DtfApiService.cs" />
     <Compile Include="Services\IDtfApiService.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\CommentMediaAttachmentViewItem.cs" />
     <Compile Include="ViewModels\CommentsViewModel.cs" />
+    <Compile Include="ViewModels\CommentViewItem.cs" />
     <Compile Include="ViewModels\EntryViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\NewsViewModel.cs" />
