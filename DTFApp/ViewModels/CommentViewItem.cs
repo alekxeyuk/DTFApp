@@ -82,6 +82,24 @@ namespace DTFApp.ViewModels
             }
         }
         public Visibility NicknameVisibility => string.IsNullOrWhiteSpace(NicknameText) ? Visibility.Collapsed : Visibility.Visible;
+
+        public string SubheaderText
+        {
+            get
+            {
+                var nickname = NicknameText;
+                var time = TimeAgo;
+                if (string.IsNullOrWhiteSpace(nickname) && string.IsNullOrWhiteSpace(time))
+                    return "";
+                if (string.IsNullOrWhiteSpace(nickname))
+                    return time;
+                if (string.IsNullOrWhiteSpace(time))
+                    return nickname;
+                return $"{nickname}  {time}";
+            }
+        }
+        public Visibility SubheaderVisibility => string.IsNullOrWhiteSpace(SubheaderText) ? Visibility.Collapsed : Visibility.Visible;
+
         public string Text { get; }
 
         public Visibility TextVisibility => string.IsNullOrWhiteSpace(Text) ? Visibility.Collapsed : Visibility.Visible;

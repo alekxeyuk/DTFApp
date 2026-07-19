@@ -76,55 +76,36 @@
                                         Text="{Binding IsExpanded, Converter={StaticResource BoolToGlyphConverter}, Mode=OneWay}"/>
                                 </Button>
 
-                                <Ellipse
+                                <Image
                                     Grid.Column="1"
                                     Width="40"
                                     Height="40"
                                     Margin="0,0,8,0"
-                                    VerticalAlignment="Top">
-                                    <Ellipse.Fill>
-                                        <ImageBrush ImageSource="{Binding AvatarUrl}" Stretch="UniformToFill"/>
-                                    </Ellipse.Fill>
-                                </Ellipse>
+                                    VerticalAlignment="Top"
+                                    Source="{Binding AvatarUrl}" Stretch="UniformToFill">
+                                </Image>
 
                                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal">
                                         <TextBlock
-                                            Grid.Column="0"
                                             FontSize="14"
                                             FontWeight="SemiBold"
                                             Text="{x:Bind AuthorName}"
                                             TextTrimming="CharacterEllipsis"/>
                                         <Image
-                                            Grid.Column="1"
                                             Width="18"
                                             Height="18"
                                             Margin="5,0,0,0"
                                             Source="{Binding BadgeUrl}"
                                             Stretch="Uniform"
                                             Visibility="{x:Bind BadgeVisibility}"/>
-                                    </Grid>
-                                    <Grid Margin="0,1,0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock
-                                            Grid.Column="0"
-                                            Margin="0,0,6,0"
-                                            FontSize="12"
-                                            Text="{x:Bind NicknameText}"
-                                            TextTrimming="CharacterEllipsis"
-                                            Visibility="{x:Bind NicknameVisibility}"/>
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            FontSize="12"
-                                            Text="{x:Bind TimeAgo}"/>
-                                    </Grid>
+                                    </StackPanel>
+                                    <TextBlock
+                                        Margin="0,1,0,0"
+                                        FontSize="12"
+                                        Text="{x:Bind SubheaderText}"
+                                        TextTrimming="CharacterEllipsis"
+                                        Visibility="{x:Bind SubheaderVisibility}"/>
                                 </StackPanel>
                             </Grid>
 
