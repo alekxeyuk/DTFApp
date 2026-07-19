@@ -58,10 +58,9 @@ namespace DTFApp.ViewModels
             get => _isHiddenByCollapse;
             set
             {
-                if (SetProperty(ref _isHiddenByCollapse, value))
-                {
-                    OnPropertyChanged(nameof(RowVisibility));
-                }
+                if (_isHiddenByCollapse == value) return;
+                _isHiddenByCollapse = value;
+                OnPropertyChanged(nameof(RowVisibility));
             }
         }
 
