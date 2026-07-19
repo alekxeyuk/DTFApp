@@ -2,7 +2,6 @@ using DTFApp.Models;
 using DTFApp.Services;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -16,7 +15,7 @@ namespace DTFApp.ViewModels
         private string _errorMessage;
         private bool _hasLoadedComments;
 
-        public ObservableCollection<CommentViewItem> Comments { get; } = new ObservableCollection<CommentViewItem>();
+        public BulkObservableCollection<CommentViewItem> Comments { get; } = new BulkObservableCollection<CommentViewItem>();
 
         public bool IsLoading
         {
@@ -76,26 +75,27 @@ namespace DTFApp.ViewModels
 
                 var byId = new Dictionary<long, CommentViewItem>();
                 var ordered = new List<CommentViewItem>();
-                foreach (var comment in response.Result.Items)
+
+                using (Comments.DeferNotifications())
                 {
-                    var item = new CommentViewItem(comment);
-                    Comments.Add(item);
-                    ordered.Add(item);
-                    byId[item.Id] = item;
+                    foreach (var comment in response.Result.Items)
+                    {
+                        var item = new CommentViewItem(comment);
+                        Comments.Add(item);
+                        ordered.Add(item);
+                        byId[item.Id] = item;
+                    }
                 }
 
                 BuildCommentTree(ordered, byId);
-                var roots = new List<CommentViewItem>();
                 foreach (var item in ordered)
                 {
                     var replyTo = item.Comment?.ReplyTo ?? 0;
                     if (replyTo == 0 || !byId.ContainsKey(replyTo))
                     {
-                        roots.Add(item);
+                        ItemVisibility(item, parentHidden: false);
                     }
                 }
-                foreach (var root in roots)
-                    ItemVisibility(root, parentHidden: false);
             }
             catch (System.OperationCanceledException)
             {

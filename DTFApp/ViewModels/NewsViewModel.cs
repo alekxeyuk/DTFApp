@@ -1,6 +1,6 @@
 using DTFApp.Models;
 using DTFApp.Services;
-using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DTFApp.ViewModels
@@ -12,7 +12,7 @@ namespace DTFApp.ViewModels
         private bool _isLoading;
         private bool _hasMoreItems = true;
 
-        public ObservableCollection<NewsData> NewsItems { get; } = new ObservableCollection<NewsData>();
+        public BulkObservableCollection<NewsData> NewsItems { get; } = new BulkObservableCollection<NewsData>();
 
         public bool IsLoading
         {
@@ -46,11 +46,7 @@ namespace DTFApp.ViewModels
                 if (result?.News != null)
                 {
                     OldCount = NewsItems.Count;
-                    foreach (var item in result.News)
-                    {
-                        if (item.Data != null)
-                            NewsItems.Add(item.Data);
-                    }
+                    NewsItems.AddRange(result.News.Where(item => item.Data != null).Select(item => item.Data));
                     _lastId = result.LastId;
                     HasMoreItems = result.News.Length > 0;
                 }
