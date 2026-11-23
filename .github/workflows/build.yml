@@ -1,0 +1,26 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86, ARM]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore NuGet packages
+        run: msbuild DTFApp.sln /t:Restore /p:Configuration=Release /v:minimal
+
+      - name: Build Release|${{ matrix.platform }}
+        run: msbuild DTFApp.sln /p:Configuration=Release /p:Platform=${{ matrix.platform }} /m /v:minimal /p:GenerateAppxPackageOnBuild=false /p:AppxBundle=Never /p:DeployOnBuild=false
