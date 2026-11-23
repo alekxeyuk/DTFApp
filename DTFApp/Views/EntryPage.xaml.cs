@@ -166,7 +166,7 @@ namespace DTFApp.Views
 
         private void ShowFullscreenImage(string uuid)
         {
-            var url = $"https://leonardo.osnova.io/{uuid}/";
+            var url = $"{ApiConstants.LeonardoBaseUrl}/{uuid}/";
             var bounds = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds;
             _fullscreenImage.MaxWidth = bounds.Width;
             _fullscreenImage.MaxHeight = bounds.Height;

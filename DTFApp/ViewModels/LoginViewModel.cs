@@ -1,4 +1,5 @@
 using DTFApp.Services;
+using System;
 using System.Threading.Tasks;
 
 namespace DTFApp.ViewModels
@@ -37,12 +38,28 @@ namespace DTFApp.ViewModels
 
         public async Task LoginAsync()
         {
-            StatusText = await _apiService.LoginAsync(Email, Password);
+            try
+            {
+                StatusText = await _apiService.LoginAsync(Email, Password);
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"Error: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"Login error: {ex}");
+            }
         }
 
         public async Task RegisterAsync()
         {
-            StatusText = await _apiService.RegisterAsync(Email, Password, "Test");
+            try
+            {
+                StatusText = await _apiService.RegisterAsync(Email, Password, "Test");
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"Error: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"Register error: {ex}");
+            }
         }
     }
 }

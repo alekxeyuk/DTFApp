@@ -215,7 +215,7 @@ namespace DTFApp.ViewModels
 
                     var url = uuid.StartsWith("http")
                         ? uuid
-                        : $"https://leonardo.osnova.io/{uuid}/-/scale_crop/480x/";
+                        : ApiConstants.LeonardoScaleCropUrl(uuid, "480x");
 
                     attachments.Add(new CommentMediaAttachmentViewItem
                     {
@@ -230,7 +230,7 @@ namespace DTFApp.ViewModels
                         ? null
                         : uuid.StartsWith("http")
                             ? uuid
-                            : $"https://leonardo.osnova.io/{uuid}/-/scale_crop/480x/";
+                            : ApiConstants.LeonardoScaleCropUrl(uuid, "480x");
 
                     attachments.Add(new CommentMediaAttachmentViewItem
                     {

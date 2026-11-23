@@ -30,8 +30,21 @@
             </Button>
         </Grid>
 
-        <ScrollViewer x:Name="EntryScrollViewer" Grid.Row="1">
-            <StackPanel x:Name="BlocksPanel" Margin="10" />
-        </ScrollViewer>
+        <Grid Grid.Row="1">
+            <ScrollViewer x:Name="EntryScrollViewer">
+                <StackPanel x:Name="BlocksPanel" Margin="10" />
+            </ScrollViewer>
+            <TextBlock
+                Margin="16"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                FontSize="14"
+                Foreground="Gray"
+                Text="{Binding ViewModel.ErrorMessage}"
+                TextAlignment="Center"
+                TextWrapping="Wrap"
+                IsHitTestVisible="False"
+                Visibility="{Binding ViewModel.ErrorVisibility}"/>
+        </Grid>
     </Grid>
 </Page>

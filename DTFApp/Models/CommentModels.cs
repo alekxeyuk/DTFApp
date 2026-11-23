@@ -1,3 +1,4 @@
+using DTFApp.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -82,7 +83,7 @@ namespace DTFApp.Models
                 var uuid = Avatar?.Data?.Uuid;
                 if (string.IsNullOrEmpty(uuid)) return null;
                 if (uuid.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return uuid;
-                return $"https://leonardo.osnova.io/{uuid}/-/scale_crop/48x/";
+                return ApiConstants.LeonardoScaleCropUrl(uuid, "48x");
             }
         }
     }
