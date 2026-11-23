@@ -17,7 +17,15 @@ jobs:
       matrix:
         platform: [x86, ARM]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+
+      - name: Add MSBuild to PATH
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1
+          if (-not $msbuild) { throw "MSBuild not found" }
+          Write-Host "MSBuild: $msbuild"
+          Add-Content -Path $env:GITHUB_PATH -Value (Split-Path $msbuild -Parent)
 
       - name: Restore NuGet packages
         run: msbuild DTFApp.sln /t:Restore /p:Configuration=Release /v:minimal
