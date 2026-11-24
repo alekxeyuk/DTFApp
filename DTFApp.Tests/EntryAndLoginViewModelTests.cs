@@ -79,7 +79,7 @@ namespace DTFApp.Tests
         public async Task RegisterAsync_OnSuccess_ShowsFriendlyMessage()
         {
             var api = new FakeDtfApiService { LoginResult = "{\"result\":{\"token\":\"x\"}}" };
-            var vm = new LoginViewModel(api) { Email = "a@b.c", Password = "pw" };
+            var vm = new LoginViewModel(api) { Email = "a@b.c", Password = "pw", Name = "Tester" };
 
             await vm.RegisterAsync();
 

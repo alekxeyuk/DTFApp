@@ -14,6 +14,9 @@ namespace DTFApp.Models
         [JsonProperty("title")]
         public string Title { get; set; }
 
+        [JsonProperty("url")]
+        public string Url { get; set; }
+
         [JsonProperty("blocks")]
         public Block[] Blocks { get; set; }
 

@@ -10,6 +10,7 @@ namespace DTFApp.ViewModels
         private readonly IDtfApiService _apiService;
         private string _email;
         private string _password;
+        private string _name;
         private string _statusText;
 
         public string Email
@@ -22,6 +23,12 @@ namespace DTFApp.ViewModels
         {
             get => _password;
             set => SetProperty(ref _password, value);
+        }
+
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
         }
 
         public string StatusText
@@ -42,6 +49,7 @@ namespace DTFApp.ViewModels
             try
             {
                 var raw = await _apiService.LoginAsync(Email, Password);
+                SettingsService.AuthToken = ExtractToken(raw);
                 StatusText = FormatAuthResponse(raw, "Logged in");
             }
             catch (Exception ex)
@@ -55,13 +63,30 @@ namespace DTFApp.ViewModels
         {
             try
             {
-                var raw = await _apiService.RegisterAsync(Email, Password, "Test");
+                if (string.IsNullOrWhiteSpace(Name))
+                {
+                    StatusText = "Enter name";
+                    return;
+                }
+                var raw = await _apiService.RegisterAsync(Email, Password, Name);
                 StatusText = FormatAuthResponse(raw, "Registered");
             }
             catch (Exception ex)
             {
                 StatusText = $"Error: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine($"Register error: {ex}");
+            }
+        }
+
+        private static string ExtractToken(string raw)
+        {
+            try
+            {
+                return JObject.Parse(raw)?["result"]?["token"]?.ToString();
+            }
+            catch
+            {
+                return null;
             }
         }
 

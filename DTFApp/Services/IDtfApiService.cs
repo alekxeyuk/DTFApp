@@ -13,5 +13,6 @@ namespace DTFApp.Services
         Task<QuizResultResponse> GetQuizResultsAsync(string hash, CancellationToken ct = default);
         Task<string> LoginAsync(string email, string password, CancellationToken ct = default);
         Task<string> RegisterAsync(string email, string password, string name, CancellationToken ct = default);
+        Task<string> AddCommentAsync(long contentId, string text, long replyTo, string token, CancellationToken ct = default);
     }
 }
