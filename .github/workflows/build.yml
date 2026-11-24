@@ -32,3 +32,15 @@ jobs:
 
       - name: Build Release|${{ matrix.platform }}
         run: msbuild DTFApp.sln /p:Configuration=Release /p:Platform=${{ matrix.platform }} /m /v:minimal /p:GenerateAppxPackageOnBuild=false /p:AppxBundle=Never /p:DeployOnBuild=false
+
+  test:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Run unit tests
+        run: dotnet test DTFApp.Tests/DTFApp.Tests.csproj -c Release --nologo
