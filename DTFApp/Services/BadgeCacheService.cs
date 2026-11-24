@@ -42,7 +42,7 @@ namespace DTFApp.Services
 
                 if (_updateTask == null)
                 {
-                    _updateTask = UpdateBadgesCoreAsync();
+                    _updateTask = UpdateBadgesCoreAsync(ct);
                 }
 
                 return _updateTask;
@@ -60,16 +60,16 @@ namespace DTFApp.Services
             }
 
             if (string.IsNullOrWhiteSpace(staticUuid)) return null;
-            return $"https://leonardo.osnova.io/{staticUuid}/-/scale_crop/18x/";
+            return ApiConstants.LeonardoScaleCropUrl(staticUuid, "18x");
         }
 
-        private static async Task UpdateBadgesCoreAsync()
+        private static async Task UpdateBadgesCoreAsync(CancellationToken ct)
         {
             try
             {
                 await EnsureCacheLoadedAsync();
 
-                var response = await _apiService.GetBadgeAssetsAsync();
+                var response = await _apiService.GetBadgeAssetsAsync(ct);
                 var badges = response?.Result?.Badges;
                 if (badges == null) return;
 

@@ -18,7 +18,8 @@
 
         <Button Grid.Row="0" Content="&lt; Back" Click="BackButton_Click" Margin="5"/>
 
-        <controls:RefreshContainer x:Name="RefreshContainer" Grid.Row="1" RefreshRequested="RefreshContainer_RefreshRequested">
+        <Grid Grid.Row="1">
+        <controls:RefreshContainer x:Name="RefreshContainer" RefreshRequested="RefreshContainer_RefreshRequested">
             <ListView
             x:Name="NewsListView"
             SelectionMode="None"
@@ -75,5 +76,18 @@
                 </ListView.ItemTemplate>
             </ListView>
         </controls:RefreshContainer>
+
+        <TextBlock
+            Margin="16"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontSize="14"
+            Foreground="Gray"
+            Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+            TextAlignment="Center"
+            TextWrapping="Wrap"
+            IsHitTestVisible="False"
+            Visibility="{x:Bind ViewModel.ErrorVisibility, Mode=OneWay}"/>
+        </Grid>
     </Grid>
 </Page>

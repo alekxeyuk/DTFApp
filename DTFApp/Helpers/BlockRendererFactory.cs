@@ -148,7 +148,7 @@ namespace DTFApp.Helpers
 
                 if (imgData.DataType == "gif")
                 {
-                    var videoUrl = $"https://leonardo.osnova.io/{imgData.Uuid}/-/format/mp4/";
+                    var videoUrl = $"{ApiConstants.LeonardoBaseUrl}/{imgData.Uuid}/-/format/mp4/";
                     var mediaElement = new MediaElement
                     {
                         Source = new Uri(videoUrl),
@@ -188,7 +188,7 @@ namespace DTFApp.Helpers
                 }
                 else
                 {
-                    var url = $"https://leonardo.osnova.io/{imgData.Uuid}/-/scale_crop/{screenWidth}x/";
+                    var url = ApiConstants.LeonardoScaleCropUrl(imgData.Uuid, screenWidth + "x");
                     var bitmap = new BitmapImage(new Uri(url));
                     var uuid = imgData.Uuid;
                     var image = new Image
