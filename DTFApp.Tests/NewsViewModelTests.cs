@@ -58,6 +58,7 @@ namespace DTFApp.Tests
 
             Assert.IsFalse(vm.HasMoreItems);
             Assert.AreEqual(0, vm.NewsItems.Count);
+            Assert.AreEqual(Visibility.Visible, vm.EmptyVisibility);
         }
 
         [TestMethod]
