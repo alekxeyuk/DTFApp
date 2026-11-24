@@ -1,4 +1,5 @@
 using DTFApp.ViewModels;
+using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -35,29 +36,22 @@ namespace DTFApp.Views
 
         private void ExpandToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("=== Toggle button CLICK event fired ===");
-            if (sender is FrameworkElement fe)
+            if (sender is FrameworkElement fe && fe.DataContext is CommentViewItem item)
             {
-                System.Diagnostics.Debug.WriteLine($"Button DataContext: {fe.DataContext?.GetType().Name}");
-                if (fe.DataContext is CommentViewItem item)
-                {
-                    System.Diagnostics.Debug.WriteLine($"DataContext item: {item.Id}, HasReplies: {item.HasReplies}, Children: {item.Children.Count}");
-                    ViewModel.ToggleCollapse(item);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"No valid DataContext: {fe.DataContext}");
-                }
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine($"Sender is not FrameworkElement: {sender?.GetType().Name}");
+                ViewModel.ToggleCollapse(item);
             }
         }
 
         private async void LoadCommentsAsync(long contentId)
         {
-            await ViewModel.LoadCommentsAsync(contentId);
+            try
+            {
+                await ViewModel.LoadCommentsAsync(contentId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading comments: {ex}");
+            }
         }
     }
 }

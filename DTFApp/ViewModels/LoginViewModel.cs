@@ -29,7 +29,7 @@ namespace DTFApp.ViewModels
             set => SetProperty(ref _statusText, value);
         }
 
-        public LoginViewModel() : this(new DtfApiService()) { }
+        public LoginViewModel() : this(AppServices.Api) { }
 
         public LoginViewModel(IDtfApiService apiService)
         {

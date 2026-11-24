@@ -28,9 +28,16 @@ namespace DTFApp.Views
 
         private async void NewsPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (ViewModel.NewsItems.Count == 0)
+            try
             {
-                await ViewModel.LoadNewsAsync();
+                if (ViewModel.NewsItems.Count == 0)
+                {
+                    await ViewModel.LoadNewsAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading news: {ex}");
             }
         }
 
@@ -38,7 +45,14 @@ namespace DTFApp.Views
         {
             using (args.GetDeferral())
             {
-                await ViewModel.RefreshAsync();
+                try
+                {
+                    await ViewModel.RefreshAsync();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error refreshing news: {ex}");
+                }
             }
         }
 

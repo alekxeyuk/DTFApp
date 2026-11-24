@@ -15,13 +15,20 @@ namespace DTFApp.ViewModels
         private bool _isLoading;
         private bool _hasMoreItems = true;
         private string _errorMessage;
+        private bool _hasLoadedNews;
 
         public BulkObservableCollection<NewsData> NewsItems { get; } = new BulkObservableCollection<NewsData>();
 
         public bool IsLoading
         {
             get => _isLoading;
-            set => SetProperty(ref _isLoading, value);
+            set
+            {
+                if (SetProperty(ref _isLoading, value))
+                {
+                    OnPropertyChanged(nameof(EmptyVisibility));
+                }
+            }
         }
 
         public bool HasMoreItems
@@ -38,15 +45,20 @@ namespace DTFApp.ViewModels
                 if (SetProperty(ref _errorMessage, value))
                 {
                     OnPropertyChanged(nameof(ErrorVisibility));
+                    OnPropertyChanged(nameof(EmptyVisibility));
                 }
             }
         }
 
         public Visibility ErrorVisibility => string.IsNullOrWhiteSpace(ErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
 
+        public Visibility EmptyVisibility => _hasLoadedNews && !IsLoading && string.IsNullOrWhiteSpace(ErrorMessage) && NewsItems.Count == 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
         public int OldCount { get; private set; }
 
-        public NewsViewModel() : this(new DtfApiService()) { }
+        public NewsViewModel() : this(AppServices.Api) { }
 
         public NewsViewModel(IDtfApiService apiService)
         {
@@ -81,6 +93,7 @@ namespace DTFApp.ViewModels
             }
             finally
             {
+                _hasLoadedNews = true;
                 IsLoading = false;
             }
         }
