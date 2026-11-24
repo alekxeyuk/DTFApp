@@ -53,5 +53,29 @@ namespace DTFApp.Views
                 System.Diagnostics.Debug.WriteLine($"Error loading comments: {ex}");
             }
         }
+
+        private async void RetryButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await ViewModel.LoadCommentsAsync(_contentId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading comments: {ex}");
+            }
+        }
+
+        private async void SendCommentButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await ViewModel.SendCommentAsync(_contentId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error sending comment: {ex}");
+            }
+        }
     }
 }

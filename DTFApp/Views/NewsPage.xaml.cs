@@ -1,5 +1,6 @@
 using DTFApp.Helpers;
 using DTFApp.Models;
+using DTFApp.Services;
 using DTFApp.ViewModels;
 using System;
 using System.Threading.Tasks;
@@ -61,6 +62,30 @@ namespace DTFApp.Views
             if (e.ClickedItem is NewsData newsItem)
             {
                 this.Frame.Navigate(typeof(EntryPage), newsItem.Id);
+            }
+        }
+
+        private async void RetryButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await ViewModel.RefreshAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error refreshing news: {ex}");
+            }
+        }
+
+        private void FavoriteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.DataContext is NewsData item)
+            {
+                bool isFavorite = FavoritesService.Toggle(item);
+                if ((sender as Button)?.Content is FontIcon icon)
+                {
+                    icon.Glyph = isFavorite ? "\uE735" : "\uE734";
+                }
             }
         }
 

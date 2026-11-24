@@ -87,6 +87,31 @@ namespace DTFApp.Views
             }
         }
 
+        private void RetryButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_entryId != 0)
+            {
+                LoadEntryAsync(_entryId);
+            }
+        }
+
+        private void ShareButton_Click(object sender, RoutedEventArgs e)
+        {
+            var url = ViewModel.Url;
+            if (string.IsNullOrEmpty(url)) url = $"https://dtf.ru/entry/{_entryId}";
+            var title = ViewModel.Title ?? "DTF";
+            var manager = Windows.ApplicationModel.DataTransfer.DataTransferManager.GetForCurrentView();
+            Windows.Foundation.TypedEventHandler<Windows.ApplicationModel.DataTransfer.DataTransferManager, Windows.ApplicationModel.DataTransfer.DataRequestedEventArgs> handler = null;
+            handler = (s, args) =>
+            {
+                args.Request.Data.SetWebLink(new Uri(url));
+                args.Request.Data.Properties.Title = title;
+                manager.DataRequested -= handler;
+            };
+            manager.DataRequested += handler;
+            Windows.ApplicationModel.DataTransfer.DataTransferManager.ShowShareUI();
+        }
+
         private async void LoadEntryAsync(long id)
         {
             try

@@ -53,13 +53,13 @@ namespace DTFApp.Helpers.BlockRenderers
                     var mediaElement = new MediaElement
                     {
                         Source = new Uri(videoUrl),
-                        AutoPlay = !imgData.HasAudio,
+                        AutoPlay = !imgData.HasAudio && SettingsService.AutoplayGifs,
                         IsMuted = true,
                         AreTransportControlsEnabled = imgData.HasAudio,
                         Stretch = Windows.UI.Xaml.Media.Stretch.Uniform,
                         MaxHeight = 400,
                         Margin = new Thickness(0, 5, 0, 5),
-                        IsLooping = !imgData.HasAudio,
+                        IsLooping = !imgData.HasAudio && SettingsService.AutoplayGifs,
                     };
                     grid.Children.Add(mediaElement);
                     mediaElement.MediaOpened += (s, e) =>
@@ -77,7 +77,7 @@ namespace DTFApp.Helpers.BlockRenderers
                         bool inView = e.EffectiveViewport.Height > 0
                             && e.EffectiveViewport.Top < Window.Current.Bounds.Height
                             && e.EffectiveViewport.Bottom > 0;
-                        if (inView && !imgData.HasAudio)
+                        if (inView && !imgData.HasAudio && SettingsService.AutoplayGifs)
                         {
                             mediaElement.Play();
                         }
@@ -89,7 +89,8 @@ namespace DTFApp.Helpers.BlockRenderers
                 }
                 else
                 {
-                    var url = ApiConstants.LeonardoScaleCropUrl(imgData.Uuid, screenWidth + "x");
+                    var size = SettingsService.LowDataMode ? "480x" : screenWidth + "x";
+                    var url = ApiConstants.LeonardoScaleCropUrl(imgData.Uuid, size);
                     var bitmap = new BitmapImage(new Uri(url));
                     var uuid = imgData.Uuid;
                     var image = new Image
