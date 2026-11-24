@@ -53,14 +53,37 @@ namespace DTFApp.Tests
     public class LoginViewModelTests
     {
         [TestMethod]
-        public async Task LoginAsync_OnSuccess_SetsStatusText()
+        public async Task LoginAsync_OnSuccess_ShowsFriendlyMessage_WithoutToken()
         {
-            var api = new FakeDtfApiService { LoginResult = "{\"token\":\"abc\"}" };
+            var api = new FakeDtfApiService { LoginResult = "{\"result\":{\"token\":\"secret-token\"}}" };
             var vm = new LoginViewModel(api) { Email = "a@b.c", Password = "pw" };
 
             await vm.LoginAsync();
 
-            Assert.AreEqual("{\"token\":\"abc\"}", vm.StatusText);
+            Assert.AreEqual("Logged in", vm.StatusText);
+            Assert.IsFalse(vm.StatusText.Contains("secret-token"));
+        }
+
+        [TestMethod]
+        public async Task LoginAsync_MessageResponse_ShowsServerMessage()
+        {
+            var api = new FakeDtfApiService { LoginResult = "{\"message\":\"email not confirmed\"}" };
+            var vm = new LoginViewModel(api) { Email = "a@b.c", Password = "pw" };
+
+            await vm.LoginAsync();
+
+            Assert.AreEqual("email not confirmed", vm.StatusText);
+        }
+
+        [TestMethod]
+        public async Task RegisterAsync_OnSuccess_ShowsFriendlyMessage()
+        {
+            var api = new FakeDtfApiService { LoginResult = "{\"result\":{\"token\":\"x\"}}" };
+            var vm = new LoginViewModel(api) { Email = "a@b.c", Password = "pw" };
+
+            await vm.RegisterAsync();
+
+            Assert.AreEqual("Registered", vm.StatusText);
         }
 
         [TestMethod]

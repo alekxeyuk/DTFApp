@@ -1,4 +1,5 @@
 using DTFApp.Services;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
@@ -40,7 +41,8 @@ namespace DTFApp.ViewModels
         {
             try
             {
-                StatusText = await _apiService.LoginAsync(Email, Password);
+                var raw = await _apiService.LoginAsync(Email, Password);
+                StatusText = FormatAuthResponse(raw, "Logged in");
             }
             catch (Exception ex)
             {
@@ -53,13 +55,31 @@ namespace DTFApp.ViewModels
         {
             try
             {
-                StatusText = await _apiService.RegisterAsync(Email, Password, "Test");
+                var raw = await _apiService.RegisterAsync(Email, Password, "Test");
+                StatusText = FormatAuthResponse(raw, "Registered");
             }
             catch (Exception ex)
             {
                 StatusText = $"Error: {ex.Message}";
                 System.Diagnostics.Debug.WriteLine($"Register error: {ex}");
             }
+        }
+
+        private static string FormatAuthResponse(string raw, string successText)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return successText;
+            try
+            {
+                var json = JObject.Parse(raw);
+                var message = json["message"]?.ToString();
+                if (!string.IsNullOrEmpty(message)) return message;
+                if (json["result"] != null || json["error"] == null) return successText;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Auth response parse error: {ex.Message}");
+            }
+            return successText;
         }
     }
 }

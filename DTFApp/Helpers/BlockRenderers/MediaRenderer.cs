@@ -70,7 +70,7 @@ namespace DTFApp.Helpers.BlockRenderers
                             mediaElement.Height = mediaElement.ActualWidth * mediaElement.NaturalVideoHeight / mediaElement.NaturalVideoWidth;
                         }
                     };
-                    mediaElement.MediaFailed += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+                    mediaElement.MediaFailed += (s, e) => ShowLoadError(placeholder);
 
                     grid.EffectiveViewportChanged += (s, e) =>
                     {
@@ -102,13 +102,26 @@ namespace DTFApp.Helpers.BlockRenderers
                     image.Tapped += (s, e) => _context.OnImageTapped?.Invoke(uuid);
                     grid.Children.Add(image);
                     bitmap.ImageOpened += (s, e) => placeholder.Visibility = Visibility.Collapsed;
-                    bitmap.ImageFailed += (s, e) => placeholder.Visibility = Visibility.Collapsed;
+                    bitmap.ImageFailed += (s, e) => ShowLoadError(placeholder);
                 }
 
                 panel.Children.Add(grid);
             }
 
             return panel.Children.Count > 0 ? panel : null;
+        }
+
+        private static void ShowLoadError(Border placeholder)
+        {
+            placeholder.Child = new TextBlock
+            {
+                Text = "Failed to load media",
+                Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.White),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                TextWrapping = TextWrapping.Wrap,
+                TextAlignment = TextAlignment.Center
+            };
         }
     }
 }
