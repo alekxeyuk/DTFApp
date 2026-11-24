@@ -131,7 +131,14 @@
     </Compile>
     <Compile Include="Helpers\BoolToGlyphConverter.cs" />
     <Compile Include="Helpers\BoolToVisibilityConverter.cs" />
+    <Compile Include="Helpers\BlockRendererContext.cs" />
     <Compile Include="Helpers\BlockRendererFactory.cs" />
+    <Compile Include="Helpers\BlockRenderers\HeaderRenderer.cs" />
+    <Compile Include="Helpers\BlockRenderers\ListRenderer.cs" />
+    <Compile Include="Helpers\BlockRenderers\MediaRenderer.cs" />
+    <Compile Include="Helpers\BlockRenderers\QuizRenderer.cs" />
+    <Compile Include="Helpers\BlockRenderers\QuoteRenderer.cs" />
+    <Compile Include="Helpers\BlockRenderers\TextRenderer.cs" />
     <Compile Include="Helpers\HtmlHelper.cs" />
     <Compile Include="Helpers\VisualTreeExtensions.cs" />
     <Compile Include="Models\BadgeModels.cs" />
