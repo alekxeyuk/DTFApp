@@ -170,7 +170,9 @@ namespace DTFApp.Views
             var bounds = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds;
             _fullscreenImage.MaxWidth = bounds.Width;
             _fullscreenImage.MaxHeight = bounds.Height;
-            _fullscreenImage.Source = new BitmapImage(new Uri(url));
+            var bitmap = new BitmapImage(new Uri(url));
+            bitmap.ImageFailed += (s, e) => HideFullscreenImage();
+            _fullscreenImage.Source = bitmap;
             _fullscreenOverlay.Visibility = Visibility.Visible;
         }
 
