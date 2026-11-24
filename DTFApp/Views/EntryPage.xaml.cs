@@ -34,9 +34,9 @@ namespace DTFApp.Views
         {
             InitializeComponent();
             DataContext = this;
-            _apiService = new DtfApiService();
+            _apiService = AppServices.Api;
             SetupFullscreenOverlay();
-            Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
+            App.BackRequested += OnBackRequested;
         }
 
         protected override void OnNavigatedTo(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
@@ -62,7 +62,7 @@ namespace DTFApp.Views
         protected override void OnNavigatedFrom(Windows.UI.Xaml.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested -= OnBackRequested;
+            App.BackRequested -= OnBackRequested;
         }
 
         private void OnBackRequested(object sender, Windows.UI.Core.BackRequestedEventArgs e)

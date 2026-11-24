@@ -44,7 +44,7 @@ namespace DTFApp.ViewModels
 
         public Visibility ErrorVisibility => string.IsNullOrWhiteSpace(ErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
 
-        public EntryViewModel() : this(new DtfApiService()) { }
+        public EntryViewModel() : this(AppServices.Api) { }
 
         public EntryViewModel(IDtfApiService apiService)
         {

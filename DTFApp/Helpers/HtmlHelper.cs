@@ -52,8 +52,17 @@ namespace DTFApp.Helpers
             return new HtmlTag { Name = name, IsClosing = isClosing, IsSelfClosing = isSelfClosing, Href = href };
         }
 
+        private const int MaxParseDepth = 50;
+
         public static void ParseInlines(string html, ref int i, IList<Inline> output, string closeTag)
         {
+            ParseInlines(html, ref i, output, closeTag, 0);
+        }
+
+        private static void ParseInlines(string html, ref int i, IList<Inline> output, string closeTag, int depth)
+        {
+            if (depth > MaxParseDepth) return;
+
             while (i < html.Length)
             {
                 if (html[i] == '<')
@@ -74,7 +83,7 @@ namespace DTFApp.Helpers
                             {
                                 var bold = new Bold();
                                 var sub = new List<Inline>();
-                                ParseInlines(html, ref i, sub, tag.Value.Name);
+                                ParseInlines(html, ref i, sub, tag.Value.Name, depth + 1);
                                 foreach (var inline in sub)
                                     bold.Inlines.Add(inline);
                                 output.Add(bold);
@@ -85,7 +94,7 @@ namespace DTFApp.Helpers
                             {
                                 var italic = new Italic();
                                 var sub = new List<Inline>();
-                                ParseInlines(html, ref i, sub, tag.Value.Name);
+                                ParseInlines(html, ref i, sub, tag.Value.Name, depth + 1);
                                 foreach (var inline in sub)
                                     italic.Inlines.Add(inline);
                                 output.Add(italic);
@@ -97,7 +106,7 @@ namespace DTFApp.Helpers
                                 if (tag.Value.Href != null)
                                     link.NavigateUri = new Uri(tag.Value.Href);
                                 var sub = new List<Inline>();
-                                ParseInlines(html, ref i, sub, tag.Value.Name);
+                                ParseInlines(html, ref i, sub, tag.Value.Name, depth + 1);
                                 foreach (var inline in sub)
                                     link.Inlines.Add(inline);
                                 output.Add(link);

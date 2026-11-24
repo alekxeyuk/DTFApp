@@ -16,6 +16,13 @@ namespace DTFApp
     {
         private static bool _backRequestedRegistered;
 
+        public static event EventHandler<BackRequestedEventArgs> BackRequested;
+
+        private static Type _lastPageType;
+        private static object _lastNavigationParameter;
+        private const string LastPageTypeKey = "LastPageType";
+        private const string LastPageArgKey = "LastPageArg";
+
         /// <summary>
         /// Инициализирует одноэлементный объект приложения.  Это первая выполняемая строка разрабатываемого
         /// кода; поэтому она является логическим эквивалентом main() или WinMain().
@@ -45,7 +52,17 @@ namespace DTFApp
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    //TODO: Загрузить состояние из ранее приостановленного приложения
+                    var settings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                    var savedPageTypeName = settings.Values[LastPageTypeKey] as string;
+                    if (!string.IsNullOrEmpty(savedPageTypeName))
+                    {
+                        var savedPageType = Type.GetType(savedPageTypeName);
+                        if (savedPageType != null && savedPageType != typeof(Views.MainPage))
+                        {
+                            _lastPageType = savedPageType;
+                            _lastNavigationParameter = settings.Values[LastPageArgKey];
+                        }
+                    }
                 }
 
                 // Размещение фрейма в текущем окне
@@ -59,7 +76,14 @@ namespace DTFApp
                     // Если стек навигации не восстанавливается для перехода к первой странице,
                     // настройка новой страницы путем передачи необходимой информации в качестве параметра
                     // параметр
-                    rootFrame.Navigate(typeof(Views.MainPage), e.Arguments);
+                    if (_lastPageType != null)
+                    {
+                        rootFrame.Navigate(_lastPageType, _lastNavigationParameter);
+                    }
+                    else
+                    {
+                        rootFrame.Navigate(typeof(Views.MainPage), e.Arguments);
+                    }
                 }
 
                 // Обеспечение активности текущего окна
@@ -72,6 +96,8 @@ namespace DTFApp
                 {
                     SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
                         rootFrame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
+                    _lastPageType = args.SourcePageType;
+                    _lastNavigationParameter = args.Parameter;
                 };
 
                 if (!_backRequestedRegistered)
@@ -86,7 +112,8 @@ namespace DTFApp
 
         private void App_BackRequested(object sender, BackRequestedEventArgs e)
         {
-            if (Window.Current.Content is Frame rootFrame && rootFrame.CanGoBack)
+            BackRequested?.Invoke(this, e);
+            if (!e.Handled && Window.Current.Content is Frame rootFrame && rootFrame.CanGoBack)
             {
                 rootFrame.GoBack();
                 e.Handled = true;
@@ -113,7 +140,12 @@ namespace DTFApp
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Сохранить состояние приложения и остановить все фоновые операции
+            if (_lastPageType != null)
+            {
+                var settings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                settings.Values[LastPageTypeKey] = _lastPageType.FullName;
+                settings.Values[LastPageArgKey] = _lastNavigationParameter;
+            }
             deferral.Complete();
         }
     }

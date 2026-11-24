@@ -88,6 +88,17 @@
             TextWrapping="Wrap"
             IsHitTestVisible="False"
             Visibility="{x:Bind ViewModel.ErrorVisibility, Mode=OneWay}"/>
+
+        <TextBlock
+            Margin="16"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            FontSize="14"
+            Foreground="Gray"
+            Text="No news"
+            TextAlignment="Center"
+            IsHitTestVisible="False"
+            Visibility="{x:Bind ViewModel.EmptyVisibility, Mode=OneWay}"/>
         </Grid>
     </Grid>
 </Page>

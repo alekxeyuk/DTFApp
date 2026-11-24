@@ -13,7 +13,7 @@ namespace DTFApp.Services
         private const string CacheFileName = "badge-cache.json";
         private static readonly object _lock = new object();
         private static readonly Dictionary<string, string> _badgeStaticUuids = new Dictionary<string, string>();
-        private static readonly IDtfApiService _apiService = new DtfApiService();
+        private static readonly IDtfApiService _apiService = AppServices.Api;
         private static Task _loadTask;
         private static Task _updateTask;
         private static bool _hasUpdatedBadges;

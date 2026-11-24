@@ -49,7 +49,7 @@ namespace DTFApp.ViewModels
             ? Visibility.Visible
             : Visibility.Collapsed;
 
-        public CommentsViewModel() : this(new DtfApiService()) { }
+        public CommentsViewModel() : this(AppServices.Api) { }
 
         public CommentsViewModel(IDtfApiService apiService)
         {
