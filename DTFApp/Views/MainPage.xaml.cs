@@ -36,6 +36,7 @@ namespace DTFApp.Views
             {
                 ViewModel.Email = UsernameTextBox.Text;
                 ViewModel.Password = PasswordBox.Password;
+                ViewModel.Name = NameTextBox.Text;
                 await ViewModel.RegisterAsync();
                 StatusBox.Text = ViewModel.StatusText;
             }
@@ -49,6 +50,16 @@ namespace DTFApp.Views
         private void NewsButton_Click(object sender, RoutedEventArgs e)
         {
             this.Frame.Navigate(typeof(NewsPage));
+        }
+
+        private void FavoritesButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(FavoritesPage));
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(SettingsPage));
         }
     }
 }

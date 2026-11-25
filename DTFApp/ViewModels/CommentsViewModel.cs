@@ -14,6 +14,7 @@ namespace DTFApp.ViewModels
         private bool _isLoading;
         private string _errorMessage;
         private bool _hasLoadedComments;
+        private string _newCommentText;
 
         public BulkObservableCollection<CommentViewItem> Comments { get; } = new BulkObservableCollection<CommentViewItem>();
 
@@ -40,6 +41,42 @@ namespace DTFApp.ViewModels
                     OnPropertyChanged(nameof(ErrorVisibility));
                     OnPropertyChanged(nameof(EmptyVisibility));
                 }
+            }
+        }
+
+        public string NewCommentText
+        {
+            get => _newCommentText;
+            set => SetProperty(ref _newCommentText, value);
+        }
+
+        public bool IsLoggedIn => !string.IsNullOrEmpty(SettingsService.AuthToken);
+
+        public Visibility ComposerVisibility => IsLoggedIn ? Visibility.Visible : Visibility.Collapsed;
+
+        public async Task SendCommentAsync(long contentId, CancellationToken ct = default)
+        {
+            if (!IsLoggedIn)
+            {
+                ErrorMessage = "Login required to comment";
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(NewCommentText)) return;
+
+            try
+            {
+                await _apiService.AddCommentAsync(contentId, NewCommentText.Trim(), 0, SettingsService.AuthToken, ct);
+                NewCommentText = null;
+                await LoadCommentsAsync(contentId, ct);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                System.Diagnostics.Debug.WriteLine($"Error sending comment: {ex}");
             }
         }
 

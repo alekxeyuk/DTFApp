@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" Content="&lt; Back" Click="BackButton_Click" Margin="5"/>
+        <Button x:Uid="BackButton" Grid.Row="0" Content="&lt; Back" Click="BackButton_Click" Margin="5"/>
 
         <Grid Grid.Row="1">
         <controls:RefreshContainer x:Name="RefreshContainer" RefreshRequested="RefreshContainer_RefreshRequested">
@@ -71,25 +71,43 @@
                                     <TextBlock FontSize="12" Foreground="Gray" Text="{Binding Counters.Views, Mode=OneWay}" Margin="3,0,0,0" />
                                 </StackPanel>
                             </Grid>
+                            <Button
+                                Click="FavoriteButton_Click"
+                                HorizontalAlignment="Right"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="4">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE734;" FontSize="16"/>
+                            </Button>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
         </controls:RefreshContainer>
 
-        <TextBlock
+        <StackPanel
             Margin="16"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            FontSize="14"
-            Foreground="Gray"
-            Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
-            TextAlignment="Center"
-            TextWrapping="Wrap"
             IsHitTestVisible="False"
-            Visibility="{x:Bind ViewModel.ErrorVisibility, Mode=OneWay}"/>
+            Visibility="{x:Bind ViewModel.ErrorVisibility, Mode=OneWay}">
+            <TextBlock
+                x:Uid="ErrorText"
+                FontSize="14"
+                Foreground="Gray"
+                Text="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+                TextAlignment="Center"
+                TextWrapping="Wrap"/>
+            <Button
+                x:Uid="RetryButton"
+                Margin="0,10,0,0"
+                HorizontalAlignment="Center"
+                Content="Retry"
+                Click="RetryButton_Click"/>
+        </StackPanel>
 
         <TextBlock
+            x:Uid="NoNewsText"
             Margin="16"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"

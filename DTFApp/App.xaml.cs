@@ -53,14 +53,16 @@ namespace DTFApp
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     var settings = Windows.Storage.ApplicationData.Current.LocalSettings;
-                    var savedPageTypeName = settings.Values[LastPageTypeKey] as string;
+                    object savedPageTypeValue;
+                    var savedPageTypeName = settings.Values.TryGetValue(LastPageTypeKey, out savedPageTypeValue) ? savedPageTypeValue as string : null;
                     if (!string.IsNullOrEmpty(savedPageTypeName))
                     {
                         var savedPageType = Type.GetType(savedPageTypeName);
                         if (savedPageType != null && savedPageType != typeof(Views.MainPage))
                         {
                             _lastPageType = savedPageType;
-                            _lastNavigationParameter = settings.Values[LastPageArgKey];
+                            object savedArg;
+                            _lastNavigationParameter = settings.Values.TryGetValue(LastPageArgKey, out savedArg) ? savedArg : null;
                         }
                     }
                 }
@@ -107,6 +109,32 @@ namespace DTFApp
                 }
 
                 _ = BadgeCacheService.UpdateBadgesAsync();
+            }
+        }
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            base.OnActivated(args);
+            if (args is ProtocolActivatedEventArgs protocolArgs && protocolArgs.Uri != null)
+            {
+                HandleProtocolUri(protocolArgs.Uri);
+            }
+        }
+
+        private static void HandleProtocolUri(Uri uri)
+        {
+            var segments = uri.AbsolutePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length >= 2
+                && segments[0].Equals("entry", StringComparison.OrdinalIgnoreCase)
+                && long.TryParse(segments[1], out var id))
+            {
+                if (!(Window.Current.Content is Frame frame))
+                {
+                    frame = new Frame();
+                    Window.Current.Content = frame;
+                }
+                frame.Navigate(typeof(Views.EntryPage), id);
+                Window.Current.Activate();
             }
         }
 

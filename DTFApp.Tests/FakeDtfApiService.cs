@@ -62,5 +62,17 @@ namespace DTFApp.Tests
             if (LoginException != null) throw LoginException;
             return Task.FromResult(LoginResult);
         }
+
+        public Exception AddCommentException { get; set; }
+        public string LastCommentText { get; private set; }
+        public long LastCommentContentId { get; private set; }
+
+        public Task<string> AddCommentAsync(long contentId, string text, long replyTo, string token, CancellationToken ct = default)
+        {
+            LastCommentContentId = contentId;
+            LastCommentText = text;
+            if (AddCommentException != null) throw AddCommentException;
+            return Task.FromResult("{\"result\":{\"id\":1}}");
+        }
     }
 }

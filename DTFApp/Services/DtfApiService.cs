@@ -85,6 +85,29 @@ namespace DTFApp.Services
             return await PostStringAsync($"{ApiConstants.ApiBaseUrl}/v3.0/auth/email/register", form, ct);
         }
 
+        public async Task<string> AddCommentAsync(long contentId, string text, long replyTo, string token, CancellationToken ct = default)
+        {
+            var payload = JsonConvert.SerializeObject(new Dictionary<string, object>
+            {
+                { "contentId", contentId },
+                { "text", text },
+                { "replyTo", replyTo }
+            });
+            using (var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiConstants.ApiBaseUrl}/v2.0/comments/add"))
+            {
+                request.Content = new StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
+                using (var response = await _httpClient.SendAsync(request, ct))
+                {
+                    response.EnsureSuccessStatusCode();
+                    return await response.Content.ReadAsStringAsync();
+                }
+            }
+        }
+
         private async Task<string> GetStringAsync(string url, CancellationToken ct)
         {
             using (var response = await _httpClient.GetAsync(url, ct))

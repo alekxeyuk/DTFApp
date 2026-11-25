@@ -72,10 +72,16 @@ namespace Windows.Storage
         public System.Threading.Tasks.Task<StorageFile> CreateFileAsync(string name, CreationCollisionOption option) => System.Threading.Tasks.Task.FromResult(new StorageFile());
     }
 
+    public class ApplicationDataContainer
+    {
+        public System.Collections.Generic.IDictionary<string, object> Values { get; } = new System.Collections.Generic.Dictionary<string, object>();
+    }
+
     public class ApplicationData
     {
         public static ApplicationData Current { get; } = new ApplicationData();
         public StorageFolder LocalFolder { get; } = new StorageFolder();
+        public ApplicationDataContainer LocalSettings { get; } = new ApplicationDataContainer();
     }
 
     public static class FileIO
